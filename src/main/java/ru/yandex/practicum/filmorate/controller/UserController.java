@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -16,7 +17,7 @@ public class UserController {
     private long userCounter = 0;
 
     @GetMapping
-    public List<User> getAllFilms() {
+    public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
     }
 
@@ -43,7 +44,7 @@ public class UserController {
     }
 
     public void validateUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (user.getName() == null || StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
     }
