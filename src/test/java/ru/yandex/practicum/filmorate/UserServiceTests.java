@@ -146,8 +146,8 @@ public class UserServiceTests {
         userService.addFriend(testUser.getId(), secondUser.getId());
         userService.addFriend(testUser.getId(), thirdUser.getId());
 
-        final List<User> commonFriendList = userService.
-                findCommonFriends(secondUser.getId(), thirdUser.getId());
+        final List<User> commonFriendList = userService
+                .findCommonFriends(secondUser.getId(), thirdUser.getId());
 
         Assertions.assertNotNull(commonFriendList);
         Assertions.assertTrue(commonFriendList.contains(testUser));
