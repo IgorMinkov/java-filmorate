@@ -39,8 +39,8 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleControllerValidationException
-            (final ConstraintViolationException e) {
+    public ErrorResponse handleControllerValidationException(
+            final ConstraintViolationException e) {
         log.warn(e.getMessage());
         return new ErrorResponse(
                 e.getMessage()
