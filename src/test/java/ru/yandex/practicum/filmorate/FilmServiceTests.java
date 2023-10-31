@@ -40,22 +40,26 @@ public class FilmServiceTests {
     @Test
     public void createAndGetFilmsTest() {
         Assertions.assertNotNull(testFilm);
-        Assertions.assertEquals(newFilm,testFilm);
+        Assertions.assertEquals(newFilm, testFilm);
 
         final List<Film> filmsList = filmService.getAllFilms();
         Assertions.assertNotNull(filmsList);
+
+        newFilm.setReleaseDate(LocalDate.of(1885, 9, 2));
+        Assertions.assertThrows(ValidationException.class,
+                () -> filmService.createFilm(newFilm));
     }
 
     @Test
     public void updateFilmTest() {
         Film updatedFilm = filmService.updateFilm(testFilm);
-        Assertions.assertEquals(testFilm,updatedFilm);
+        Assertions.assertEquals(testFilm, updatedFilm);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> filmService.updateFilm(null));
 
-        Film unknownFilm = new Film(-1,"Движение вверх","За себя и за Сашку!",
-                LocalDate.of(2018,6,6),123, new HashSet<>());
+        Film unknownFilm = new Film(-1, "Движение вверх", "За себя и за Сашку!",
+                LocalDate.of(2018, 6, 6), 123, new HashSet<>());
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> filmService.updateFilm(unknownFilm));
@@ -65,7 +69,7 @@ public class FilmServiceTests {
     public void getFilmByIdTest() {
         final Film film = filmService.getFilmById(testFilm.getId());
         Assertions.assertNotNull(film);
-        Assertions.assertEquals(testFilm,film);
+        Assertions.assertEquals(testFilm, film);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> filmService.getFilmById(null));
@@ -77,11 +81,11 @@ public class FilmServiceTests {
     @Test
     public void addLikeTest() {
         User testUser = new User(1, "test@ya-test.ru", "bad_comedian",
-                null, LocalDate.of(1991,5,24), new HashSet<>());
+                null, LocalDate.of(1991, 5, 24), new HashSet<>());
         final User user = userService.createUser(testUser);
 
-        filmService.addLike(testFilm.getId(),user.getId());
-        Assertions.assertEquals(testFilm.getLikes().size(),1);
+        filmService.addLike(testFilm.getId(), user.getId());
+        Assertions.assertEquals(testFilm.getLikes().size(), 1);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> filmService.addLike(null, user.getId()));
@@ -97,14 +101,14 @@ public class FilmServiceTests {
     @Test
     public void removeLikeTest() {
         User testUser = new User(1, "test@ya-test.ru", "bad_comedian",
-                null, LocalDate.of(1991,5,24), new HashSet<>());
+                null, LocalDate.of(1991, 5, 24), new HashSet<>());
         final User user = userService.createUser(testUser);
 
-        filmService.addLike(testFilm.getId(),user.getId());
-        Assertions.assertEquals(testFilm.getLikes().size(),1);
+        filmService.addLike(testFilm.getId(), user.getId());
+        Assertions.assertEquals(testFilm.getLikes().size(), 1);
 
-        filmService.removeLike(testFilm.getId(),user.getId());
-        Assertions.assertEquals(testFilm.getLikes().size(),0);
+        filmService.removeLike(testFilm.getId(), user.getId());
+        Assertions.assertEquals(testFilm.getLikes().size(), 0);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> filmService.removeLike(null, user.getId()));
@@ -120,13 +124,13 @@ public class FilmServiceTests {
     @Test
     public void getPopularFilmsTest() {
         User testUser = new User(1, "test@ya-test.ru", "bad_comedian",
-                null, LocalDate.of(1991,5,24), new HashSet<>());
+                null, LocalDate.of(1991, 5, 24), new HashSet<>());
         final User user = userService.createUser(testUser);
 
-        filmService.addLike(testFilm.getId(),user.getId());
+        filmService.addLike(testFilm.getId(), user.getId());
         final List<Film> popFilmList = filmService.getPopularFilms(10);
         Assertions.assertNotNull(popFilmList);
-        Assertions.assertEquals(popFilmList.size(),1);
+        Assertions.assertEquals(popFilmList.size(), 1);
 
         Assertions.assertThrows(ValidationException.class,
                 () -> filmService.getPopularFilms(0));
@@ -135,19 +139,10 @@ public class FilmServiceTests {
                 () -> filmService.getPopularFilms(-1));
     }
 
-    @Test
-    void validateFilm() {
-        filmService.validateFilm(newFilm);
-
-        newFilm.setReleaseDate(LocalDate.of(1885,9,2));
-        Assertions.assertThrows(ValidationException.class,
-                () -> filmService.validateFilm(newFilm));
-    }
-
     private Film createFilm() {
-        return new Film(1,"Back to the Future Part III",
+        return new Film(1, "Back to the Future Part III",
                 "Third part of the legendary movie",
-                LocalDate.of(1990,5,25),
+                LocalDate.of(1990, 5, 25),
                 118,
                 new HashSet<>());
     }

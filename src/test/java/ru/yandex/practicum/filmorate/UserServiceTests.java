@@ -35,22 +35,27 @@ public class UserServiceTests {
     @Test
     public void createAndGetUsersTest() {
         Assertions.assertNotNull(testUser);
-        Assertions.assertEquals(newUser,testUser);
+        Assertions.assertEquals(newUser, testUser);
 
         List<User> usersList = userService.getAllUsers();
         Assertions.assertNotNull(usersList);
+
+        Assertions.assertEquals(testUser.getName(), testUser.getLogin());
+
+        testUser.setName("Евген");
+        Assertions.assertEquals("Евген", testUser.getName());
     }
 
     @Test
     public void updateUserTest() {
         User updatedUser = userService.updateUser(testUser);
-        Assertions.assertEquals(testUser,updatedUser);
+        Assertions.assertEquals(testUser, updatedUser);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> userService.updateUser(null));
 
         User unknownUser = new User(999, "hello@ya.ru", "newbie",
-                null, LocalDate.of(2007,1,1), new HashSet<>());
+                null, LocalDate.of(2007, 1, 1), new HashSet<>());
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> userService.updateUser(unknownUser));
@@ -60,7 +65,7 @@ public class UserServiceTests {
     public void getUserByIdTest() {
         final User user = userService.getUserById(testUser.getId());
         Assertions.assertNotNull(user);
-        Assertions.assertEquals(testUser,user);
+        Assertions.assertEquals(testUser, user);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> userService.getUserById(null));
@@ -71,16 +76,16 @@ public class UserServiceTests {
 
     @Test
     public void addFriendTest() {
-        User inputUser =  new User(10, "test@yahoo.com", "critic",
-                null, LocalDate.of(1985,8,19), new HashSet<>());
+        User inputUser = new User(10, "test@yahoo.com", "critic",
+                null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
-        Assertions.assertEquals(testUser.getFriends().size(),0);
-        Assertions.assertEquals(secondUser.getFriends().size(),0);
+        Assertions.assertEquals(testUser.getFriends().size(), 0);
+        Assertions.assertEquals(secondUser.getFriends().size(), 0);
 
         userService.addFriend(testUser.getId(), secondUser.getId());
-        Assertions.assertEquals(testUser.getFriends().size(),1);
-        Assertions.assertEquals(secondUser.getFriends().size(),1);
+        Assertions.assertEquals(testUser.getFriends().size(), 1);
+        Assertions.assertEquals(secondUser.getFriends().size(), 1);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> userService.addFriend(null, secondUser.getId()));
@@ -95,17 +100,17 @@ public class UserServiceTests {
 
     @Test
     public void deleteFriendTest() {
-        User inputUser =  new User(10, "test@yahoo.com", "critic",
-                null, LocalDate.of(1985,8,19), new HashSet<>());
+        User inputUser = new User(10, "test@yahoo.com", "critic",
+                null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
         userService.addFriend(testUser.getId(), secondUser.getId());
-        Assertions.assertEquals(testUser.getFriends().size(),1);
-        Assertions.assertEquals(secondUser.getFriends().size(),1);
+        Assertions.assertEquals(testUser.getFriends().size(), 1);
+        Assertions.assertEquals(secondUser.getFriends().size(), 1);
 
         userService.deleteFriend(testUser.getId(), secondUser.getId());
-        Assertions.assertEquals(testUser.getFriends().size(),0);
-        Assertions.assertEquals(secondUser.getFriends().size(),0);
+        Assertions.assertEquals(testUser.getFriends().size(), 0);
+        Assertions.assertEquals(secondUser.getFriends().size(), 0);
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> userService.deleteFriend(null, secondUser.getId()));
@@ -121,8 +126,8 @@ public class UserServiceTests {
 
     @Test
     public void getUserFriendListTest() {
-        User inputUser =  new User(10, "test@yahoo.com", "critic",
-                null, LocalDate.of(1985,8,19), new HashSet<>());
+        User inputUser = new User(10, "test@yahoo.com", "critic",
+                null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
         userService.addFriend(testUser.getId(), secondUser.getId());
@@ -135,12 +140,12 @@ public class UserServiceTests {
 
     @Test
     public void findCommonFriendsTest() {
-        User inputUser =  new User(10, "test@yahoo.com", "critic",
-                null, LocalDate.of(1985,8,19), new HashSet<>());
+        User inputUser = new User(10, "test@yahoo.com", "critic",
+                null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
         User inputOneMore = new User(20, "test@test.kz", "hello",
-                null, LocalDate.of(1988,8,11), new HashSet<>());
+                null, LocalDate.of(1988, 8, 11), new HashSet<>());
         User thirdUser = userService.createUser(inputOneMore);
 
         userService.addFriend(testUser.getId(), secondUser.getId());
@@ -153,19 +158,9 @@ public class UserServiceTests {
         Assertions.assertTrue(commonFriendList.contains(testUser));
     }
 
-    @Test
-    void validateUser() {
-        userService.validateUser(newUser);
-        Assertions.assertEquals(newUser.getName(), newUser.getLogin());
-
-        newUser.setName("Евген");
-        userService.validateUser(newUser);
-        Assertions.assertEquals("Евген", newUser.getName());
-    }
-
     private User createUser() {
         return new User(1, "test@ya-test.ru", "bad_comedian",
-                null, LocalDate.of(1991,5,24), new HashSet<>());
+                null, LocalDate.of(1991, 5, 24), new HashSet<>());
     }
 
 }

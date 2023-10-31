@@ -76,7 +76,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public void validateFilm(Film film) {
+    private void validateFilm(Film film) {
         if (film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
             throw new ValidationException("Невозможная дата премьеры фильма");
         }

@@ -18,7 +18,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Ошибка валидации: " + e.getMessage());
     }
 
     @ExceptionHandler
@@ -32,9 +32,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(final Throwable ex) {
         log.warn(ex.getMessage());
-        return new ErrorResponse(
-                ex.getMessage()
-        );
+        return new ErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler
@@ -42,9 +40,7 @@ public class ErrorHandler {
     public ErrorResponse handleControllerValidationException(
             final ConstraintViolationException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse(
-                e.getMessage()
-        );
+        return new ErrorResponse(e.getMessage());
     }
 
 }

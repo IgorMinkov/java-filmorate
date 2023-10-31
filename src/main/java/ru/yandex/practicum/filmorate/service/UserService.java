@@ -30,7 +30,7 @@ public class UserService {
         if (user == null) {
             throw new ValidationException("в метод передан null");
         }
-        validateUser(user);
+        checkUserName(user);
         return userStorage.createUser(user);
     }
 
@@ -39,7 +39,7 @@ public class UserService {
             throw new DataNotFoundException(
                     String.format("Не найден пользователь для обновления: %s", user));
         }
-        validateUser(user);
+        checkUserName(user);
         return userStorage.updateUser(user);
     }
 
@@ -74,8 +74,8 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void validateUser(User user) {
-        if (user.getName() == null || StringUtils.isBlank(user.getName())) {
+    private void checkUserName(User user) {
+        if (StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
     }
