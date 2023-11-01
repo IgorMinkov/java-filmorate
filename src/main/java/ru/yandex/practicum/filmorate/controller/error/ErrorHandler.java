@@ -25,14 +25,14 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final DataNotFoundException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Произошла ошибка: " + e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(final Throwable ex) {
         log.warn(ex.getMessage());
-        return new ErrorResponse(ex.getMessage());
+        return new ErrorResponse("Непредвиденная ошибка: " + ex.getMessage());
     }
 
     @ExceptionHandler
@@ -40,7 +40,7 @@ public class ErrorHandler {
     public ErrorResponse handleControllerValidationException(
             final ConstraintViolationException e) {
         log.warn(e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Ошибка валидации входящих данных: " + e.getMessage());
     }
 
 }

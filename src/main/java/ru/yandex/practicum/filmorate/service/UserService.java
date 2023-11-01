@@ -30,7 +30,9 @@ public class UserService {
         if (user == null) {
             throw new ValidationException("в метод передан null");
         }
-        checkUserName(user);
+        if (StringUtils.isBlank(user.getName())) {
+            user.setName(user.getLogin());
+        }
         return userStorage.createUser(user);
     }
 
@@ -39,7 +41,6 @@ public class UserService {
             throw new DataNotFoundException(
                     String.format("Не найден пользователь для обновления: %s", user));
         }
-        checkUserName(user);
         return userStorage.updateUser(user);
     }
 
@@ -72,12 +73,6 @@ public class UserService {
         return getUserFriendList(id).stream()
                 .filter(x -> getUserFriendList(otherId).contains(x))
                 .collect(Collectors.toList());
-    }
-
-    private void checkUserName(User user) {
-        if (StringUtils.isBlank(user.getName())) {
-            user.setName(user.getLogin());
-        }
     }
 
 }
