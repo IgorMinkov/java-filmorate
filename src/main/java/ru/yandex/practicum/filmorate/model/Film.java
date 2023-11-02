@@ -1,15 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-@Builder
 @EqualsAndHashCode(of = {"id"})
+@AllArgsConstructor
+@NoArgsConstructor
 public class Film {
 
     private long id;
@@ -25,6 +26,12 @@ public class Film {
 
     @Min(1)
     private long duration;
+
+    private Set<Long> likes = new HashSet<>();
+
+    public long getLikesCount() {
+        return likes.size();
+    }
 
 }
 
