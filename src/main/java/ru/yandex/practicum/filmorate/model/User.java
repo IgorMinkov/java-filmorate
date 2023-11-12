@@ -29,6 +29,6 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    private Set<Long> friends = new HashSet<>();
+    private Set<Long> friends = new HashSet<>(); // Map<Long, boolean>
 
 }
