@@ -19,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -35,7 +36,9 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAllFilms() {
         String sqlQuery =  "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm);
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -84,17 +87,23 @@ public class FilmDbStorage implements FilmStorage {
     public Film getFilmById(Long id) {
         String sqlQuery = "SELECT f.*, m.rating_name FROM films f" +
                 " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id WHERE f.film_id = ?";
-        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id);
-        films.get(0).setGenres(genreStorage.getFilmGenres(id));
-        return films.get(0);
+        Film film = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id).stream()
+                .findAny().orElseThrow(() -> new DataNotFoundException("не найден фильм с id" + id));
+        film.setGenres(genreStorage.getFilmGenres(id));
+        return film;
     }
 
     @Override
     public List<Film> getPopularFilms(Integer limit) {
-        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_rating" +
-                " FROM films f LEFT OUTER JOIN likes l ON l.film_id = f.film_id " +
-                "GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC LIMIT (?)";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, limit);
+        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration," +
+                " f.mpa_rating, m.rating_name" +
+                " FROM films f" +
+                " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
+                " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
+                " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC LIMIT (?)";
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, limit).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .collect(Collectors.toList());
     }
 
     @Override

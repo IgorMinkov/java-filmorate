@@ -67,22 +67,17 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User getUserById(Long id) {
-        checkUser(id);
         String sqlQuery = "SELECT * FROM users u WHERE u.user_id = ?";
-        List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id);
-        return users.get(0);
+        return jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id).stream().findAny()
+                .orElseThrow(() -> new DataNotFoundException(String.format("не найден фильм с id %s", id)));
     }
 
     @Override
     public void checkUser(Long id) {
         try {
-            String sqlQuery = "SELECT * FROM users u WHERE u.user_id = ?";
-            List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id);
-            if (users.isEmpty()) {
+            User user = getUserById(id);
+            if (user == null) {
                 throw new DataNotFoundException(String.format("не найден пользователь с id %s", id));
-            }
-            if (users.size() != 1) {
-                throw new DataNotFoundException(String.format("нашлось больше одного пользователя с id %s", id));
             }
             log.trace("check user id: {} - OK", id);
         } catch (EmptyResultDataAccessException e) {

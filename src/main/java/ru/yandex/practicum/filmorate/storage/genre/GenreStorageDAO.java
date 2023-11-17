@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
@@ -26,43 +25,29 @@ public class GenreStorageDAO implements GenreStorage{
 
     @Override
     public Genre getGenreById(Integer id) {
-        checkGenre(id);
         String sqlQuery = "SELECT * FROM genres g WHERE g.id = ?";
-        List<Genre> genres = jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, id);
-        return genres.get(0);
+        return jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, id).stream()
+                .findAny().orElseThrow(() -> new DataNotFoundException("не найден жанр с id" + id));
     }
 
     @Override
     public Set<Genre> getFilmGenres(Long filmId) {
-        String sqlQuery = "SELECT fg.genre_id, g.genre FROM film_genres AS fg " +
-                "LEFT JOIN GENRES g on g.id = fg.genre_id WHERE fg.film_id = ?";
+        String sqlQuery = "SELECT fg.genre_id id, g.genre FROM film_genres fg " +
+                "LEFT JOIN genres g ON g.id = fg.genre_id WHERE fg.film_id = ?";
 
         return new HashSet<>(jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, filmId));
     }
 
     @Override
     public void updateFilmGenres(Film film) {
+        String deleteQuery = "DELETE FROM film_genres WHERE film_id = ?";
+        jdbcTemplate.update(deleteQuery, film.getId());
+
         if (Objects.nonNull(film.getGenres()) && !film.getGenres().isEmpty()) {
             for (Genre genre : film.getGenres()) {
-                String sqlQuery = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+                String sqlQuery = "iNSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
                 jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
             }
-        }
-    }
-
-    @Override
-    public void checkGenre(Integer id) {
-        try {
-            String sqlQuery = "SELECT * FROM film_genres WHERE film_id = ?";
-            List<Genre> genres = jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, id);
-            if (genres.isEmpty()) {
-                throw new DataNotFoundException(String.format("не найден жанр с id %s", id));
-            }
-            if (genres.size() != 1) {
-                throw new DataNotFoundException(String.format("нашлось больше одного жанра с id %s", id));
-            }
-        } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("Ошибка SQL- в БД нет жанра с id %s", id));
         }
     }
 

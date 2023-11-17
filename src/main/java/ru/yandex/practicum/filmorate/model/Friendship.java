@@ -12,9 +12,9 @@ import javax.validation.constraints.NotNull;
 public class Friendship {
 
     @NotNull
-    private int userId;
+    private Integer userId;
 
     @NotNull
-    private int friendId;
+    private Integer friendId;
 
 }
