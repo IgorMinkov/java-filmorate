@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,12 +23,6 @@ public class LikesStorageDAO implements LikesStorage {
     public void removeLike(Long userId, Long filmId) {
         String sqlQuery = "DELETE FROM likes WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
-    }
-
-    @Override
-    public Integer getLikesCount(Long filmId) {
-        String sqlQuery = "SELECT COUNT(DISTINCT user_id) AS total FROM likes WHERE film_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) -> rs.getInt("total"), filmId);
     }
 
 }
