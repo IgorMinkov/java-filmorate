@@ -4,13 +4,12 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class User {
 
     private long id;
@@ -29,6 +28,6 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    private Set<Long> friends = new HashSet<>(); // Map<Long, boolean>
+    private Set<Long> friends;
 
 }

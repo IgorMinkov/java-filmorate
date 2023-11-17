@@ -15,4 +15,6 @@ public interface UserStorage {
 
     Optional<User> getUserById(Long id);
 
+    void checkUser(Long id);
+
 }

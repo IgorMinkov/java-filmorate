@@ -4,15 +4,13 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class Film {
 
     private long id;
@@ -29,11 +27,11 @@ public class Film {
     @Min(1)
     private long duration;
 
-    private MpaRating mpaRating;
+    private Integer mpaRatingId;
+
+    private final Set<Integer> genres;
 
     private Set<Long> likes = new HashSet<>();
-
-    private final List<Genre> genres = new ArrayList<>();
 
     public long getLikesCount() {
         return likes.size();

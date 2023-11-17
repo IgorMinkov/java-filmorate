@@ -15,4 +15,8 @@ public interface FilmStorage {
 
     Optional<Film> getFilmById(Long id);
 
+    List<Film> getPopularFilms(Integer limit);
+
+    void checkFilm(Long id);
+
 }

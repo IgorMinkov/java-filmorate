@@ -7,11 +7,10 @@ import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -19,12 +18,17 @@ public class FilmService {
     private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
     private final FilmStorage filmStorage;
+
+    private final LikesStorage likesStorage;
+
     private final UserService userService;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, UserService userService) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       UserService userService, LikesStorage likesStorage) {
         this.filmStorage = filmStorage;
         this.userService = userService;
+        this.likesStorage = likesStorage;
     }
 
     public List<Film> getAllFilms() {
@@ -35,16 +39,14 @@ public class FilmService {
         if (film == null) {
             throw new ValidationException("в метод передан null");
         }
-        validateFilm(film);
+        if (film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
+            throw new ValidationException("Невозможная дата премьеры фильма");
+        }
         return filmStorage.createFilm(film);
     }
 
     public Film updateFilm(Film film) {
-        if (film == null || !filmStorage.getAllFilms().contains(film)) {
-            throw new DataNotFoundException(
-                    String.format("Не найден фильм для обновления: %s", film));
-        }
-        validateFilm(film);
+        validateFilm(film.getId());
         return filmStorage.updateFilm(film);
     }
 
@@ -55,15 +57,15 @@ public class FilmService {
     }
 
     public void addLike(Long id, Long userId) {
-        Film film = getFilmById(id);
-        film.getLikes().add(userService.getUserById(userId).getId());
-        updateFilm(film);
+        validateFilm(id);
+        userService.validateUser(userId);
+        likesStorage.addLike(id, userId);
     }
 
     public void removeLike(Long id, Long userId) {
-        Film film = getFilmById(id);
-        film.getLikes().remove(userService.getUserById(userId).getId());
-        updateFilm(film);
+        validateFilm(id);
+        userService.validateUser(userId);
+        likesStorage.removeLike(id, userId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
@@ -71,16 +73,11 @@ public class FilmService {
             throw new ValidationException(
                     String.format("в метод getPopularFilms передан некорретный параметр: %d", count));
         }
-        return getAllFilms().stream()
-                .sorted(Comparator.comparingLong(Film::getLikesCount).reversed())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilms(count);
     }
 
-    private void validateFilm(Film film) {
-        if (film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
-            throw new ValidationException("Невозможная дата премьеры фильма");
-        }
+    private void validateFilm(Long id) {
+        filmStorage.checkFilm(id);
     }
 
 }
