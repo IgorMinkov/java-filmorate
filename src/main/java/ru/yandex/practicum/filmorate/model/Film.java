@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -12,7 +13,7 @@ import java.util.Set;
 @Builder
 public class Film {
 
-    private long id;
+    private Long id;
 
     @NotBlank
     private String name;
@@ -24,8 +25,9 @@ public class Film {
     private LocalDate releaseDate;
 
     @Min(1)
-    private long duration;
+    private Long duration;
 
+    @JsonProperty("mpa")
     private MpaRating mpaRating;
 
     private Set<Genre> genres;
@@ -33,7 +35,11 @@ public class Film {
     private Set<Long> likes;
 
     public long getLikesCount() {
-        return likes.size();
+        if (likes == null) {
+            return 0;
+        } else {
+            return likes.size();
+        }
     }
 
 }

@@ -40,8 +40,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        String sqlQuery = "INSERT INTO films (name, description, release_date, duration, mpa_rating) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO films (name, description, release_date, duration) " +
+                "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(sqlQuery, new String[]{"film_id"});
@@ -49,7 +49,6 @@ public class FilmDbStorage implements FilmStorage {
             statement.setString(2, film.getDescription());
             statement.setDate(3, Date.valueOf(film.getReleaseDate()));
             statement.setLong(4, film.getDuration());
-            statement.setInt(5, film.getMpaRating().getId());
             return statement;
         }, keyHolder);
         film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
@@ -83,7 +82,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Long id) {
-        checkFilm(id);
         String sqlQuery = "SELECT f.*, m.rating_name FROM films f" +
                 " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id WHERE f.film_id = ?";
         List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id);
@@ -102,13 +100,9 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void checkFilm(Long id) {
         try {
-            String sqlQuery = "SELECT * FROM films f WHERE f.film_id = ?";
-            List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id);
-            if (films.isEmpty()) {
+            Film film = getFilmById(id);
+            if (film == null) {
                 throw new DataNotFoundException(String.format("не найден фильм с id %s", id));
-            }
-            if (films.size() != 1) {
-                throw new DataNotFoundException(String.format("нашлось больше одного фильма с id %s", id));
             }
             log.trace("check film id: {} - OK", id);
         } catch (EmptyResultDataAccessException e) {

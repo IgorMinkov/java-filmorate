@@ -44,7 +44,7 @@ public class MpaRatingDAO implements MpaRatingStorage {
             }
         } catch (
                 EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("Ошибка SQL- в БД нет рейтинга с id %s", id));
+            throw new DataNotFoundException(String.format("Ошибка SQL - в БД нет рейтинга с id %s", id));
         }
     }
 

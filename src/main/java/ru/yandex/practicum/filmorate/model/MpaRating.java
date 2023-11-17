@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 public class MpaRating {
 
     @Min(1)
-    private int id;
+    private Integer id;
 
     @NotBlank
     private String name;
