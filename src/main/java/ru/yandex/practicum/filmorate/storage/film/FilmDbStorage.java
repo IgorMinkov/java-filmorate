@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaRatingStorage;
 
@@ -33,7 +34,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        String sqlQuery = "SELECT * FROM films GROUP BY film_id";
+        String sqlQuery =  "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm);
     }
 
@@ -48,7 +49,7 @@ public class FilmDbStorage implements FilmStorage {
             statement.setString(2, film.getDescription());
             statement.setDate(3, Date.valueOf(film.getReleaseDate()));
             statement.setLong(4, film.getDuration());
-            statement.setInt(5, film.getMpaRating());
+            statement.setInt(5, film.getMpaRating().getId());
             return statement;
         }, keyHolder);
         film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
@@ -73,7 +74,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDescription(),
                 Date.valueOf(film.getReleaseDate()),
                 film.getDuration(),
-                film.getMpaRating(),
+                film.getMpaRating().getId(),
                 film.getId());
         genreStorage.updateFilmGenres(film);
         log.info("Обновлен фильм: {}", film);
@@ -83,10 +84,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getFilmById(Long id) {
         checkFilm(id);
-        String sqlQuery = "SELECT * FROM films f WHERE f.film_id = ?";
+        String sqlQuery = "SELECT f.*, m.rating_name FROM films f" +
+                " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id WHERE f.film_id = ?";
         List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id);
-        Set<Integer> genres = genreStorage.getFilmGenres(id);
-        films.get(0).setGenres(genres);
+        films.get(0).setGenres(genreStorage.getFilmGenres(id));
         return films.get(0);
     }
 
@@ -122,7 +123,10 @@ public class FilmDbStorage implements FilmStorage {
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getLong("duration"))
-                .mpaRatingId(rs.getInt("mpa_rating"))
+                .mpaRating(MpaRating.builder()
+                        .id(rs.getInt("mpa_rating"))
+                        .name(rs.getString("rating_name"))
+                        .build())
                 .build();
     }
 

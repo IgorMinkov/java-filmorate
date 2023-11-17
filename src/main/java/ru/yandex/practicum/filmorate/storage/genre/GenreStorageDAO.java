@@ -35,19 +35,19 @@ public class GenreStorageDAO implements GenreStorage{
     }
 
     @Override
-    public Set<Integer> getFilmGenres(Long filmId) {
+    public Set<Genre> getFilmGenres(Long filmId) {
         String sqlQuery = "SELECT fg.genre_id, g.genre FROM film_genres AS fg " +
                 "LEFT JOIN GENRES g on g.id = fg.genre_id WHERE fg.film_id = ?";
 
-        return new HashSet<>(jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getInt("genre_id"), filmId));
+        return new HashSet<>(jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, filmId));
     }
 
     @Override
     public void updateFilmGenres(Film film) {
         if (!film.getGenres().isEmpty()) {
-            for (Integer genre : film.getGenres()) {
+            for (Genre genre : film.getGenres()) {
                 String sqlQuery = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-                jdbcTemplate.update(sqlQuery, film.getId(), genre);
+                jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
             }
         }
     }
