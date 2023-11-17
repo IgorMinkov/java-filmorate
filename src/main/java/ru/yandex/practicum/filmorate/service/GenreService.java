@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorageDAO;
 
@@ -19,9 +18,7 @@ public class GenreService {
     }
 
     public Genre getGenreById(Integer id) {
-        return genreStorage.getGenreById(id).orElseThrow(() ->
-                new DataNotFoundException(
-                        String.format("Не найден жанр c id: %s", id)));
+        return genreStorage.getGenreById(id);
     }
 
 }

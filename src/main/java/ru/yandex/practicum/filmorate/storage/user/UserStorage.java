@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserStorage {
 
@@ -13,7 +12,7 @@ public interface UserStorage {
 
     User updateUser(User user);
 
-    Optional<User> getUserById(Long id);
+    User getUserById(Long id);
 
     void checkUser(Long id);
 

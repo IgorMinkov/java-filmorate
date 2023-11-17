@@ -4,7 +4,6 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -27,11 +26,11 @@ public class Film {
     @Min(1)
     private long duration;
 
-    private Integer mpaRatingId;
+    private MpaRating mpaRating;
 
-    private final Set<Integer> genres;
+    private Set<Genre> genres;
 
-    private Set<Long> likes = new HashSet<>();
+    private Set<Long> likes;
 
     public long getLikesCount() {
         return likes.size();

@@ -34,15 +34,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserById(Long id) {
-        return Optional.ofNullable(users.get(id));
+    public User getUserById(Long id) {
+        checkUser(id);
+        return users.get(id);
     }
 
     @Override
     public void checkUser(Long id) {
         if (id == null || !users.containsKey(id)) {
             throw new DataNotFoundException(
-                    String.format("Не найден пользователь для обновления: %s", id));
+                    String.format("Не найден пользователь: %s", id));
         }
     }
 

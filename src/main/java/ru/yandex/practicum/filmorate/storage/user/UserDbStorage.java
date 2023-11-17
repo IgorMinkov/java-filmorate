@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -67,22 +66,27 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserById(Long id) {
+    public User getUserById(Long id) {
+        checkUser(id);
         String sqlQuery = "SELECT * FROM users u WHERE u.user_id = ?";
         List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id);
-        if (users.size() != 1) {
-            throw new DataNotFoundException(String.format("не найден пользователь с id %s", id));
-        }
-        return Optional.of(users.get(0));
+        return users.get(0);
     }
 
     @Override
     public void checkUser(Long id) {
         try {
-            getUserById(id);
+            String sqlQuery = "SELECT * FROM users u WHERE u.user_id = ?";
+            List<User> users = jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id);
+            if (users.isEmpty()) {
+                throw new DataNotFoundException(String.format("не найден пользователь с id %s", id));
+            }
+            if (users.size() != 1) {
+                throw new DataNotFoundException(String.format("нашлось больше одного пользователя с id %s", id));
+            }
             log.trace("check user id: {} - OK", id);
         } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("в БД не найден пользователь с id %s", id));
+            throw new DataNotFoundException(String.format("Ошибка SQL- в БД нет пользователя с id %s", id));
         }
     }
 

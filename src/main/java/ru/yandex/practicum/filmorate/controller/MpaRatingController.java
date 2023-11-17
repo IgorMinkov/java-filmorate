@@ -25,7 +25,7 @@ public class MpaRatingController {
     }
 
     @GetMapping("/{id}")
-    public MpaRating getMpaRatingById(@PathVariable Long id) {
+    public MpaRating getMpaRatingById(@PathVariable Integer id) {
         return mpaRatingService.getMpaRatingById(id);
     }
 

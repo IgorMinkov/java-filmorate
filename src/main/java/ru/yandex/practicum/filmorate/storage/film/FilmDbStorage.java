@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaRatingStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -21,9 +23,13 @@ import java.util.*;
 @Component
 @Qualifier("filmDbStorage")
 @RequiredArgsConstructor
-public class FilmDbStorage implements FilmStorage { // как добавлять жанры?
+public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
+    private final GenreStorage genreStorage;
+
+    private final MpaRatingStorage mpaStorage;
 
     @Override
     public List<Film> getAllFilms() {
@@ -42,19 +48,19 @@ public class FilmDbStorage implements FilmStorage { // как добавлять
             statement.setString(2, film.getDescription());
             statement.setDate(3, Date.valueOf(film.getReleaseDate()));
             statement.setLong(4, film.getDuration());
-            statement.setInt(5, film.getMpaRatingId());
+            statement.setInt(5, film.getMpaRating());
             return statement;
         }, keyHolder);
         film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
 
-        Film createdFilm = null;
+        mpaStorage.checkMpaRating(film.getMpaRating().getId());
+        String sql = "UPDATE films SET mpa_rating = ? WHERE film_id = ?";
+        jdbcTemplate.update(sql, film.getMpaRating().getId(), film.getId());
 
-        Optional<Film> optFilm = getFilmById(film.getId());
-        if(optFilm.isPresent()) {
-            createdFilm = optFilm.get();
-        }
+        genreStorage.updateFilmGenres(film);
+        checkFilm(film.getId());
         log.info("Создан фильм: {}", film);
-        return createdFilm;
+        return film;
     }
 
     @Override
@@ -67,30 +73,21 @@ public class FilmDbStorage implements FilmStorage { // как добавлять
                 film.getDescription(),
                 Date.valueOf(film.getReleaseDate()),
                 film.getDuration(),
-                film.getMpaRatingId(),
+                film.getMpaRating(),
                 film.getId());
+        genreStorage.updateFilmGenres(film);
         log.info("Обновлен фильм: {}", film);
         return film;
     }
 
     @Override
-    public Optional<Film> getFilmById(Long id) {
+    public Film getFilmById(Long id) {
+        checkFilm(id);
         String sqlQuery = "SELECT * FROM films f WHERE f.film_id = ?";
         List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id);
-        if (films.size() != 1) {
-            throw new DataNotFoundException(String.format("не найден фильм с id %s", id));
-        }
-        return Optional.of(films.get(0));
-    }
-
-    @Override
-    public void checkFilm(Long id) {
-        try {
-            getFilmById(id);
-            log.trace("check film id: {} - OK", id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("в БД не найден фильм с id %s", id));
-        }
+        Set<Integer> genres = genreStorage.getFilmGenres(id);
+        films.get(0).setGenres(genres);
+        return films.get(0);
     }
 
     @Override
@@ -99,6 +96,23 @@ public class FilmDbStorage implements FilmStorage { // как добавлять
                 " FROM films f LEFT OUTER JOIN likes l ON l.film_id = f.film_id " +
                 "GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC LIMIT (?)";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, limit);
+    }
+
+    @Override
+    public void checkFilm(Long id) {
+        try {
+            String sqlQuery = "SELECT * FROM films f WHERE f.film_id = ?";
+            List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id);
+            if (films.isEmpty()) {
+                throw new DataNotFoundException(String.format("не найден фильм с id %s", id));
+            }
+            if (films.size() != 1) {
+                throw new DataNotFoundException(String.format("нашлось больше одного фильма с id %s", id));
+            }
+            log.trace("check film id: {} - OK", id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new DataNotFoundException(String.format("в БД не найден фильм с id %s", id));
+        }
     }
 
     static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {

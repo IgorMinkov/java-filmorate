@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friends.FriendshipStorage;
@@ -47,9 +46,8 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return userStorage.getUserById(id).orElseThrow(() ->
-                new DataNotFoundException(
-                        String.format("Не найден пользователь c id: %s", id)));
+        validateUser(id);
+        return userStorage.getUserById(id);
     }
 
     public void addFriend(Long id, Long friendId) {

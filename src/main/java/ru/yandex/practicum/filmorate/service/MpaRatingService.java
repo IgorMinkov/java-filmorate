@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaRatingStorage;
 
@@ -18,10 +17,8 @@ public class MpaRatingService {
         return mpaRatingStorage.getAllMpaRatings();
     }
 
-    public MpaRating getMpaRatingById(Long id) {
-        return mpaRatingStorage.getMpaRatingById(id).orElseThrow(() ->
-                new DataNotFoundException(
-                        String.format("Не найден рейтинг c id: %s", id)));
+    public MpaRating getMpaRatingById(Integer id) {
+        return mpaRatingStorage.getMpaRatingById(id);
     }
 
 }
