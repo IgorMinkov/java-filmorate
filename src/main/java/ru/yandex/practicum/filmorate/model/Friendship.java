@@ -17,4 +17,6 @@ public class Friendship {
     @NotNull
     private Integer friendId;
 
+    private Boolean approved;
+
 }

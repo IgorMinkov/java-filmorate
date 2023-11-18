@@ -58,8 +58,9 @@ public class FilmServiceTests {
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> filmService.updateFilm(null));
 
-        Film unknownFilm = new Film(-1, "Движение вверх", "За себя и за Сашку!",
-                LocalDate.of(2018, 6, 6), 123, new HashSet<>());
+        Film unknownFilm = new Film(-1L, "Движение вверх", "За себя и за Сашку!",
+                LocalDate.of(2018, 6, 6), 123L,
+                null, new HashSet<>(), new HashSet<>());
 
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> filmService.updateFilm(unknownFilm));
@@ -80,7 +81,7 @@ public class FilmServiceTests {
 
     @Test
     public void addLikeTest() {
-        User testUser = new User(1, "test@ya-test.ru", "bad_comedian",
+        User testUser = new User(1L, "test@ya-test.ru", "bad_comedian",
                 null, LocalDate.of(1991, 5, 24), new HashSet<>());
         final User user = userService.createUser(testUser);
 
@@ -100,7 +101,7 @@ public class FilmServiceTests {
 
     @Test
     public void removeLikeTest() {
-        User testUser = new User(1, "test@ya-test.ru", "bad_comedian",
+        User testUser = new User(1L, "test@ya-test.ru", "bad_comedian",
                 null, LocalDate.of(1991, 5, 24), new HashSet<>());
         final User user = userService.createUser(testUser);
 
@@ -123,7 +124,7 @@ public class FilmServiceTests {
 
     @Test
     public void getPopularFilmsTest() {
-        User testUser = new User(1, "test@ya-test.ru", "bad_comedian",
+        User testUser = new User(1L, "test@ya-test.ru", "bad_comedian",
                 null, LocalDate.of(1991, 5, 24), new HashSet<>());
         final User user = userService.createUser(testUser);
 
@@ -140,11 +141,10 @@ public class FilmServiceTests {
     }
 
     private Film createFilm() {
-        return new Film(37, "Back to the Future Part III",
+        return new Film(37L, "Back to the Future Part III",
                 "Third part of the legendary movie",
                 LocalDate.of(1990, 5, 25),
-                118,
-                new HashSet<>());
+                118L, null, new HashSet<>(), new HashSet<>());
     }
 
 }

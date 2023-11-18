@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Component
+@Qualifier("genreStorageDAO")
 @RequiredArgsConstructor
 public class GenreStorageDAO implements GenreStorage{
 

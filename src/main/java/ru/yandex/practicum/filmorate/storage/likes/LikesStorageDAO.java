@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.storage.likes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Qualifier("likesStorageDAO")
 @RequiredArgsConstructor
 public class LikesStorageDAO implements LikesStorage {
 

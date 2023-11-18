@@ -54,7 +54,7 @@ public class UserServiceTests {
         Assertions.assertThrows(DataNotFoundException.class,
                 () -> userService.updateUser(null));
 
-        User unknownUser = new User(999, "hello@ya.ru", "newbie",
+        User unknownUser = new User(999L, "hello@ya.ru", "newbie",
                 null, LocalDate.of(2007, 1, 1), new HashSet<>());
 
         Assertions.assertThrows(DataNotFoundException.class,
@@ -76,7 +76,7 @@ public class UserServiceTests {
 
     @Test
     public void addFriendTest() {
-        User inputUser = new User(10, "test@yahoo.com", "critic",
+        User inputUser = new User(10L, "test@yahoo.com", "critic",
                 null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
@@ -100,7 +100,7 @@ public class UserServiceTests {
 
     @Test
     public void deleteFriendTest() {
-        User inputUser = new User(10, "test@yahoo.com", "critic",
+        User inputUser = new User(10L, "test@yahoo.com", "critic",
                 null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
@@ -126,7 +126,7 @@ public class UserServiceTests {
 
     @Test
     public void getUserFriendListTest() {
-        User inputUser = new User(10, "test@yahoo.com", "critic",
+        User inputUser = new User(10L, "test@yahoo.com", "critic",
                 null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
@@ -140,11 +140,11 @@ public class UserServiceTests {
 
     @Test
     public void findCommonFriendsTest() {
-        User inputUser = new User(10, "test@yahoo.com", "critic",
+        User inputUser = new User(10L, "test@yahoo.com", "critic",
                 null, LocalDate.of(1985, 8, 19), new HashSet<>());
         User secondUser = userService.createUser(inputUser);
 
-        User inputOneMore = new User(20, "test@test.kz", "hello",
+        User inputOneMore = new User(20L, "test@test.kz", "hello",
                 null, LocalDate.of(1988, 8, 11), new HashSet<>());
         User thirdUser = userService.createUser(inputOneMore);
 
@@ -159,7 +159,7 @@ public class UserServiceTests {
     }
 
     private User createUser() {
-        return new User(1, "test@ya-test.ru", "bad_comedian",
+        return new User(1L, "test@ya-test.ru", "bad_comedian",
                 null, LocalDate.of(1991, 5, 24), new HashSet<>());
     }
 

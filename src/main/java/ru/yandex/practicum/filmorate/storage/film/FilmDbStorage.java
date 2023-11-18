@@ -35,7 +35,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        String sqlQuery =  "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
+        String sqlQuery = "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
                 .collect(Collectors.toList());
