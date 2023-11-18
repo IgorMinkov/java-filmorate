@@ -15,7 +15,7 @@ import java.util.*;
 @Component
 @Qualifier("genreStorageDAO")
 @RequiredArgsConstructor
-public class GenreStorageDAO implements GenreStorage{
+public class GenreStorageDAO implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
