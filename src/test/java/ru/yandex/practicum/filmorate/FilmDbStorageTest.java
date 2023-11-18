@@ -11,8 +11,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorageDAO;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaRatingDAO;
 
 import java.time.LocalDate;
 import java.util.HashSet;
