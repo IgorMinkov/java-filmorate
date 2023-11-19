@@ -119,7 +119,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
+    private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
         return Film.builder()
                 .id(rs.getLong("film_id"))
                 .name(rs.getString("name"))

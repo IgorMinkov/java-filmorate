@@ -45,7 +45,7 @@ public class MpaRatingDAO implements MpaRatingStorage {
         }
     }
 
-    static MpaRating buildMpaRating(ResultSet rs, int rowNum) throws SQLException {
+    private static MpaRating buildMpaRating(ResultSet rs, int rowNum) throws SQLException {
         return MpaRating.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("rating_name"))

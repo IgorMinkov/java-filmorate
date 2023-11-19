@@ -53,7 +53,7 @@ public class GenreStorageDAO implements GenreStorage {
         }
     }
 
-    static Genre buildGenre(ResultSet rs, int rowNum) throws SQLException {
+    private static Genre buildGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("genre"))

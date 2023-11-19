@@ -85,7 +85,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    static User buildUser(ResultSet rs, int rowNum) throws SQLException {
+    private static User buildUser(ResultSet rs, int rowNum) throws SQLException {
         return User.builder()
                 .id(rs.getLong("user_id"))
                 .email(rs.getString("email"))

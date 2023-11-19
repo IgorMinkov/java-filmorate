@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -30,9 +31,9 @@ public class Film {
     @JsonProperty("mpa")
     private MpaRating mpaRating;
 
-    private Set<Genre> genres;
+    private Set<Genre> genres = new HashSet<>();
 
-    private Set<Long> likes;
+    private Set<Long> likes = new HashSet<>();
 
     public long getLikesCount() {
         if (likes == null) {
