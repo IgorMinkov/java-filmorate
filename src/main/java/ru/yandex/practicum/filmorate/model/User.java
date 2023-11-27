@@ -10,10 +10,10 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class User {
 
-    private long id;
+    private Long id;
 
     @NotEmpty
     @Email
