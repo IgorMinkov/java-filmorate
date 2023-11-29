@@ -14,11 +14,11 @@ public class MpaRatingService {
     private final MpaRatingStorage mpaRatingStorage;
 
     public List<MpaRating> getAllMpaRatings() {
-        return mpaRatingStorage.getAllMpaRatings();
+        return mpaRatingStorage.getAll();
     }
 
     public MpaRating getMpaRatingById(Integer id) {
-        return mpaRatingStorage.getMpaRatingById(id);
+        return mpaRatingStorage.getById(id);
     }
 
 }

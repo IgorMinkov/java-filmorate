@@ -34,7 +34,7 @@ public class FilmDbStorage implements FilmStorage {
     private final MpaRatingStorage mpaStorage;
 
     @Override
-    public List<Film> getAllFilms() {
+    public List<Film> getAll() {
         String sqlQuery = "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
@@ -42,7 +42,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film createFilm(Film film) {
+    public Film create(Film film) {
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration) " +
                 "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -67,7 +67,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         checkFilm(film.getId());
         String sqlQuery = "UPDATE films SET name = ?, description = ?, release_date = ?, " +
                 "duration = ?, mpa_rating = ? WHERE film_id = ?";
@@ -84,7 +84,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(Long id) {
+    public Film getById(Long id) {
         String sqlQuery = "SELECT f.*, m.rating_name FROM films f" +
                 " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id WHERE f.film_id = ?";
         Film film = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id).stream()
@@ -94,7 +94,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer limit) {
+    public List<Film> getPopular(Integer limit) {
         String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration," +
                 " f.mpa_rating, m.rating_name" +
                 " FROM films f" +
@@ -109,7 +109,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void checkFilm(Long id) {
         try {
-            Film film = getFilmById(id);
+            Film film = getById(id);
             if (film == null) {
                 throw new DataNotFoundException(String.format("не найден фильм с id %s", id));
             }

@@ -27,13 +27,13 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         String sqlQuery = "SELECT * FROM users GROUP BY user_id";
         return jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser);
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(User user) {
         String sqlQuery = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -52,7 +52,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         checkUser(user.getId());
         String sqlQuery = "UPDATE USERS SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
         jdbcTemplate.update(sqlQuery,
@@ -66,7 +66,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getById(Long id) {
         String sqlQuery = "SELECT * FROM users u WHERE u.user_id = ?";
         return jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id).stream().findAny()
                 .orElseThrow(() -> new DataNotFoundException(String.format("не найден фильм с id %s", id)));
@@ -75,7 +75,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void checkUser(Long id) {
         try {
-            User user = getUserById(id);
+            User user = getById(id);
             if (user == null) {
                 throw new DataNotFoundException(String.format("не найден пользователь с id %s", id));
             }

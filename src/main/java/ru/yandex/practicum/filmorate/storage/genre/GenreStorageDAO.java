@@ -20,13 +20,13 @@ public class GenreStorageDAO implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Genre> getAllGenres() {
+    public List<Genre> getAll() {
         String sqlQuery = "SELECT * FROM genres GROUP BY id";
         return jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre);
     }
 
     @Override
-    public Genre getGenreById(Integer id) {
+    public Genre getById(Integer id) {
         String sqlQuery = "SELECT * FROM genres g WHERE g.id = ?";
         return jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, id).stream()
                 .findAny().orElseThrow(() -> new DataNotFoundException("не найден жанр с id" + id));

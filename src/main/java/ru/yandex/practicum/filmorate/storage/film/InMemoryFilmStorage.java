@@ -16,12 +16,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     private long filmCounter = 0;
 
     @Override
-    public List<Film> getAllFilms() {
+    public List<Film> getAll() {
         return new ArrayList<>(filmStorage.values());
     }
 
     @Override
-    public Film createFilm(Film film) {
+    public Film create(Film film) {
         generateFilmId(film);
         filmStorage.put(film.getId(), film);
         log.info("Создан фильм: {}", film);
@@ -29,7 +29,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         checkFilm(film.getId());
         filmStorage.put(film.getId(), film);
         log.info("Обновлен фильм: {}", film);
@@ -37,13 +37,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(Long id) {
+    public Film getById(Long id) {
         return filmStorage.get(id);
     }
 
     @Override
-    public List<Film> getPopularFilms(Integer limit) {
-        return getAllFilms().stream()
+    public List<Film> getPopular(Integer limit) {
+        return getAll().stream()
                 .sorted(Comparator.comparingLong(Film::getLikesCount).reversed())
                 .limit(limit)
                 .collect(Collectors.toList());

@@ -31,7 +31,7 @@ public class FilmService {
     }
 
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        return filmStorage.getAll();
     }
 
     public Film createFilm(Film film) {
@@ -41,16 +41,16 @@ public class FilmService {
         if (film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
             throw new ValidationException("Невозможная дата премьеры фильма");
         }
-        return filmStorage.createFilm(film);
+        return filmStorage.create(film);
     }
 
     public Film updateFilm(Film film) {
         validateFilm(film.getId());
-        return filmStorage.updateFilm(film);
+        return filmStorage.update(film);
     }
 
     public Film getFilmById(Long id) {
-        return filmStorage.getFilmById(id);
+        return filmStorage.getById(id);
     }
 
     public void addLike(Long id, Long userId) {
@@ -70,7 +70,7 @@ public class FilmService {
             throw new ValidationException(
                     String.format("в метод getPopularFilms передан некорретный параметр: %d", count));
         }
-        return filmStorage.getPopularFilms(count);
+        return filmStorage.getPopular(count);
     }
 
     private void validateFilm(Long id) {
