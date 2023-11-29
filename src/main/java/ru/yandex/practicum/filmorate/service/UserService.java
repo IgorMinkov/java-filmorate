@@ -27,7 +27,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
+        return userStorage.getAll();
     }
 
     public User createUser(User user) {
@@ -37,17 +37,17 @@ public class UserService {
         if (StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
-        return userStorage.createUser(user);
+        return userStorage.create(user);
     }
 
     public User updateUser(User user) {
         validateUser(user.getId());
-        return userStorage.updateUser(user);
+        return userStorage.update(user);
     }
 
     public User getUserById(Long id) {
         validateUser(id);
-        return userStorage.getUserById(id);
+        return userStorage.getById(id);
     }
 
     public void addFriend(Long id, Long friendId) {
@@ -62,10 +62,10 @@ public class UserService {
         friendshipStorage.deleteFriend(id,friendId);
     }
 
-    public List<User> getUserFriendList(Long id) {
+    public List<User> getFriendList(Long id) {
         validateUser(id);
         List<User> friendList = new ArrayList<>();
-        for (Long friendId : friendshipStorage.getUserFriends(id)) {
+        for (Long friendId : friendshipStorage.getFriends(id)) {
             friendList.add(getUserById(friendId));
         }
         return friendList;
@@ -74,8 +74,8 @@ public class UserService {
     public List<User> findCommonFriends(Long id, Long otherId) {
         validateUser(id);
         validateUser(otherId);
-        return getUserFriendList(id).stream()
-                .filter(x -> getUserFriendList(otherId).contains(x))
+        return getFriendList(id).stream()
+                .filter(x -> getFriendList(otherId).contains(x))
                 .collect(Collectors.toList());
     }
 

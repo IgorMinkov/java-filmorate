@@ -24,19 +24,19 @@ class UserDbStorageTest {
     public void userCrudTest() {
         User newUser = makeUser();
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
-        userStorage.createUser(newUser);
+        userStorage.create(newUser);
 
-        User savedUser = userStorage.getUserById(1L);
+        User savedUser = userStorage.getById(1L);
 
         assertThat(savedUser)
                 .isNotNull()
                 .usingRecursiveComparison()
                 .isEqualTo(newUser);
 
-        List<User> users = userStorage.getAllUsers();
+        List<User> users = userStorage.getAll();
         Assertions.assertNotNull(users);
 
-        User updatedUser = userStorage.updateUser(savedUser);
+        User updatedUser = userStorage.update(savedUser);
 
         assertThat(updatedUser)
                 .isNotNull()

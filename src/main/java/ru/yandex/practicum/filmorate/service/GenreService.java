@@ -14,11 +14,11 @@ public class GenreService {
     private final GenreStorageDAO genreStorage;
 
     public List<Genre> getAllGenres() {
-        return genreStorage.getAllGenres();
+        return genreStorage.getAll();
     }
 
     public Genre getGenreById(Integer id) {
-        return genreStorage.getGenreById(id);
+        return genreStorage.getById(id);
     }
 
 }

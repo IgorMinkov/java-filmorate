@@ -6,7 +6,7 @@ public interface FriendshipStorage {
 
     void addFriend(Long userId, Long friendId);
 
-    Set<Long> getUserFriends(Long userId);
+    Set<Long> getFriends(Long userId);
 
     void deleteFriend(Long userId, Long friendId);
 

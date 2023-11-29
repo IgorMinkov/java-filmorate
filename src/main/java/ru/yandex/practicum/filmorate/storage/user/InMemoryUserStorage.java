@@ -14,12 +14,12 @@ public class InMemoryUserStorage implements UserStorage {
     private long userCounter = 0;
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return new ArrayList<>(users.values());
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(User user) {
         generateUserId(user);
         users.put(user.getId(), user);
         log.info("Создан пользователь: {}", user);
@@ -27,14 +27,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         users.put(user.getId(), user);
         log.info("Обновлен пользователь: {}", user);
         return user;
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getById(Long id) {
         checkUser(id);
         return users.get(id);
     }

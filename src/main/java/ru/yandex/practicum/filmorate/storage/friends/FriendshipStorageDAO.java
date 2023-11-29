@@ -26,7 +26,7 @@ public class FriendshipStorageDAO implements  FriendshipStorage {
     }
 
     @Override
-    public Set<Long> getUserFriends(Long userId) {
+    public Set<Long> getFriends(Long userId) {
         Set<Long> friends = new HashSet<>();
         try {
             String sqlQuery = "SELECT friend_id FROM friendship WHERE user_id = ?";
