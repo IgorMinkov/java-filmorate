@@ -50,6 +50,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getCommon(Long userId, Long friendId) {
+        return new ArrayList<>();
+    }
+
+    @Override
     public void checkFilm(Long id) {
         if (id == null || !filmStorage.containsKey(id)) {
             throw new DataNotFoundException(

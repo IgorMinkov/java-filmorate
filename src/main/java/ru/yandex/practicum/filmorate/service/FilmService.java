@@ -53,16 +53,16 @@ public class FilmService {
         return filmStorage.getById(id);
     }
 
-    public void addLike(Long id, Long userId) {
-        validateFilm(id);
+    public void addLike(Long filmId, Long userId) {
+        validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.addLike(id, userId);
+        likesStorage.addLike(userId, filmId);
     }
 
-    public void removeLike(Long id, Long userId) {
-        validateFilm(id);
+    public void removeLike(Long filmId, Long userId) {
+        validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.removeLike(id, userId);
+        likesStorage.removeLike(userId, filmId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
@@ -71,6 +71,12 @@ public class FilmService {
                     String.format("в метод getPopularFilms передан некорретный параметр: %d", count));
         }
         return filmStorage.getPopular(count);
+    }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        userService.validateUser(userId);
+        userService.validateUser(friendId);
+        return filmStorage.getCommon(userId, friendId);
     }
 
     private void validateFilm(Long id) {

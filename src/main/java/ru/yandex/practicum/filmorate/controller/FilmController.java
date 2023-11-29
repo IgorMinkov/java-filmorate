@@ -43,22 +43,27 @@ public class FilmController {
         return filmService.updateFilm(film);
     }
 
-    @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Фильму с id: {} ставит лайк пользователь с id : {}", id, userId);
-        filmService.addLike(id, userId);
+    @PutMapping("/{filmId}/like/{userId}")
+    public void addLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        log.info("Фильму с id: {} ставит лайк пользователь с id : {}", filmId, userId);
+        filmService.addLike(filmId, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Фильму с id: {} удаляет лайк пользователь с id : {}", id, userId);
-        filmService.removeLike(id, userId);
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
+        log.info("Фильму с id: {} удаляет лайк пользователь с id : {}", filmId, userId);
+        filmService.removeLike(filmId, userId);
     }
 
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(required = false,
             defaultValue = "10") Integer count) {
         return filmService.getPopularFilms(count);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId){
+        return filmService.getCommonFilms(userId, friendId);
     }
 
 }
