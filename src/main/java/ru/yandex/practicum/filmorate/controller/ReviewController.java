@@ -82,4 +82,15 @@ public class ReviewController {
                         .isPositive(true)
                         .build());
     }
+
+    @PutMapping("{id}/dislike/{userId}")
+    public void addDislikeToReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Получен запрос на добавление дизлайка к отзыву: {} от пользователя: {}", id, userId);
+
+        reviewRatingService.create(ReviewRating.builder()
+                .reviewId(id)
+                .userId(userId)
+                .isPositive(false)
+                .build());
+    }
 }
