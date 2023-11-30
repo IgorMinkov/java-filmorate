@@ -16,6 +16,8 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
 
     @Override
     public ReviewRating create(ReviewRating reviewRating) {
+        delete(reviewRating);
+
         String sqlQuery = "INSERT INTO review_rating (review_id, user_id, is_positive) VALUES (?, ?, ?)";
 
         jdbcTemplate.update(sqlQuery, reviewRating.getReviewId(), reviewRating.getUserId(), reviewRating.getIsPositive());
