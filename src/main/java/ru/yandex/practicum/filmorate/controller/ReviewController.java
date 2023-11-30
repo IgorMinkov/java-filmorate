@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.ReviewRating;
+import ru.yandex.practicum.filmorate.service.ReviewRatingService;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 @Slf4j
@@ -29,6 +31,7 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ReviewController {
     private final ReviewService reviewService;
+    private final ReviewRatingService reviewRatingService;
 
     @PostMapping
     public Review createReview(@Valid @RequestBody Review review) {
@@ -67,5 +70,16 @@ public class ReviewController {
         }
 
         return reviewService.getReviewsByFilmId(filmId, count);
+    }
+
+    @PutMapping("{id}/like/{userId}")
+    public void addLikeToReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Получен запрос на добавление лайка к отзыву: {} от пользователя: {}", id, userId);
+
+        reviewRatingService.create(ReviewRating.builder()
+                        .reviewId(id)
+                        .userId(userId)
+                        .isPositive(true)
+                        .build());
     }
 }
