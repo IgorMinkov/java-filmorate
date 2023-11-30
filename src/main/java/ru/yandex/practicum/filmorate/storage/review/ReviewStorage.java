@@ -16,4 +16,6 @@ public interface ReviewStorage {
     List<Review> getAllReviews(int count);
 
     List<Review> getReviewsByFilmId(long filmId, int count);
+
+    void recalculateUsefulByReviewId(long reviewId);
 }
