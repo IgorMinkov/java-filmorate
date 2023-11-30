@@ -30,4 +30,11 @@ public class ReviewService {
 
         return reviewStorage.createReview(review);
     }
+
+    public Review updateReview(Review review) {
+        userStorage.checkUser(review.getUserId());
+        filmStorage.checkFilm(review.getFilmId());
+
+        return reviewStorage.updateReview(review);
+    }
 }
