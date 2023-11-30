@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 
@@ -8,11 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ru.yandex.practicum.filmorate.model.Review;
@@ -45,5 +49,23 @@ public class ReviewController {
         log.info("Получен запрос на удаление отзыва по id: {}", id);
 
         reviewService.deleteReview(id);
+    }
+
+    @GetMapping("/{id}")
+    public Review getReviewById(@Positive @PathVariable Long id) {
+        log.info("Получен запрос на загрузку отзыва по id: {}", id);
+
+        return reviewService.getReviewById(id);
+    }
+
+    @GetMapping
+    public List<Review> getReviewsByFilmId(@RequestParam(required = false) Long filmId, @Positive @RequestParam(required = false, defaultValue = "10") Integer count) {
+        log.info("Получен запрос на загрузку {} отзывов фильма по id: {}", count, filmId);
+
+        if (filmId == null) {
+            return reviewService.getAllReviews(count);
+        }
+
+        return reviewService.getReviewsByFilmId(filmId, count);
     }
 }

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.review;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
@@ -79,6 +80,20 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(sqlQuery, id);
 
         log.info("Удалён отзыв по id: {}", id);
+    }
+
+    @Override
+    public List<Review> getAllReviews(int count) {
+        String sqlQuery = "SELECT * FROM reviews ORDER BY useful DESC LIMIT ?";
+
+        return jdbcTemplate.query(sqlQuery, ReviewDbStorage::buildReview, count);
+    }
+
+    @Override
+    public List<Review> getReviewsByFilmId(long filmId, int count) {
+        String sqlQuery = "SELECT * FROM reviews WHERE film_id = ? ORDER BY useful DESC LIMIT ?";
+
+        return jdbcTemplate.query(sqlQuery, ReviewDbStorage::buildReview, filmId, count);
     }
 
     public static Review buildReview(ResultSet rs, int rowNum) throws SQLException {
