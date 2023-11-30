@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,5 +28,12 @@ public class ReviewController {
         log.info("Получен запрос на добавление нового отзыва: {}", review);
 
         return reviewService.createReview(review);
+    }
+
+    @PutMapping
+    public Review updateReview(@Valid @RequestBody Review review) {
+        log.info("Получен запрос на обновление имеющегося отзыва: {}", review);
+
+        return reviewService.updateReview(review);
     }
 }
