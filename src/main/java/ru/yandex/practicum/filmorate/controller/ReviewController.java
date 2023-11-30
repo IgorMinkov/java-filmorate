@@ -93,4 +93,15 @@ public class ReviewController {
                 .isPositive(false)
                 .build());
     }
+
+    @DeleteMapping("{id}/like/{userId}")
+    public void removeLikeFromReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Получен запрос на удаление лайка из отзыва: {} от пользователя: {}", id, userId);
+
+        reviewRatingService.delete(ReviewRating.builder()
+                .reviewId(id)
+                .userId(userId)
+                .isPositive(true)
+                .build());
+    }
 }

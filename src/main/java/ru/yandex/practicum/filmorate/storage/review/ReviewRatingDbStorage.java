@@ -24,4 +24,13 @@ public class ReviewRatingDbStorage implements ReviewRatingStorage {
 
         return reviewRating;
     }
+
+    @Override
+    public void delete(ReviewRating reviewRating) {
+        String sqlQuery = "DELETE FROM review_rating WHERE review_id = ? AND user_id = ?";
+
+        jdbcTemplate.update(sqlQuery, reviewRating.getReviewId(), reviewRating.getUserId());
+
+        log.info("Удалёна оценка из отзыва: {}", reviewRating);
+    }
 }
