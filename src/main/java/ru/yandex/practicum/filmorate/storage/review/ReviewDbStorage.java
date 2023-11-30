@@ -96,6 +96,17 @@ public class ReviewDbStorage implements ReviewStorage {
         return jdbcTemplate.query(sqlQuery, ReviewDbStorage::buildReview, filmId, count);
     }
 
+    @Override
+    public void recalculateUsefulByReviewId(long reviewId) {
+        String sqlQuery = "UPDATE reviews SET useful = ( "
+                + "(SELECT count(*) FROM review_rating WHERE review_id = ? AND is_positive = true)"
+                + " - "
+                + "(SELECT count(*) FROM review_rating WHERE review_id = ? AND is_positive = false)"
+                + ") WHERE review_id = ?";
+
+        jdbcTemplate.update(sqlQuery, reviewId, reviewId, reviewId);
+    }
+
     public static Review buildReview(ResultSet rs, int rowNum) throws SQLException {
         return Review.builder()
                 .reviewId(rs.getLong("review_id"))
