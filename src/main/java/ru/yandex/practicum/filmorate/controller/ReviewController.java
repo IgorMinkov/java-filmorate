@@ -104,4 +104,15 @@ public class ReviewController {
                 .isPositive(true)
                 .build());
     }
+
+    @DeleteMapping("{id}/dislike/{userId}")
+    public void removeDislikeFromReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Получен запрос на удаление дизлайка из отзыва: {} от пользователя: {}", id, userId);
+
+        reviewRatingService.delete(ReviewRating.builder()
+                .reviewId(id)
+                .userId(userId)
+                .isPositive(false)
+                .build());
+    }
 }
