@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS films CASCADE;
 DROP TABLE IF EXISTS mpa_rating CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS review_rating CASCADE;
 
 
 CREATE TABLE IF NOT EXISTS users (
@@ -61,4 +62,11 @@ CREATE TABLE IF NOT EXISTS reviews (
     content     VARCHAR(255) NOT NULL,
     is_positive BIT NOT NULL,
     useful      INTEGER DEFAULT 0
+    );
+
+CREATE TABLE IF NOT EXISTS review_rating (
+    review_id   BIGINT REFERENCES reviews (review_id) ON DELETE CASCADE,
+    user_id     BIGINT REFERENCES users (user_id) ON DELETE CASCADE,
+    is_positive BIT NOT NULL,
+    PRIMARY KEY (review_id, user_id)
     );
