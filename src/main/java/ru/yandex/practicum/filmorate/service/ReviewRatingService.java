@@ -30,4 +30,11 @@ public class ReviewRatingService {
         reviewRatingDbStorage.create(reviewRating);
         reviewStorage.recalculateUsefulByReviewId(reviewRating.getReviewId());
     }
+
+    public void delete(ReviewRating reviewRating) {
+        userStorage.checkUser(reviewRating.getUserId());
+
+        reviewRatingDbStorage.delete(reviewRating);
+        reviewStorage.recalculateUsefulByReviewId(reviewRating.getReviewId());
+    }
 }
