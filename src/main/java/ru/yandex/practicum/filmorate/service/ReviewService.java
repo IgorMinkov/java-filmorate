@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -40,5 +42,18 @@ public class ReviewService {
 
     public void deleteReview(Long id) {
         reviewStorage.deleteReviewById(id);
+    }
+
+    public Review getReviewById(Long id) {
+        return reviewStorage.getReviewById(id);
+    }
+
+    public List<Review> getAllReviews(Integer count) {
+        return reviewStorage.getAllReviews(count);
+    }
+
+    public List<Review> getReviewsByFilmId(Long filmId, Integer count) {
+        filmStorage.checkFilm(filmId);
+        return reviewStorage.getReviewsByFilmId(filmId, count);
     }
 }

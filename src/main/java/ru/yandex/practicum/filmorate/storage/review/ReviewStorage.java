@@ -12,4 +12,8 @@ public interface ReviewStorage {
     Review getReviewById(long id);
 
     void deleteReviewById(long id);
+
+    List<Review> getAllReviews(int count);
+
+    List<Review> getReviewsByFilmId(long filmId, int count);
 }
