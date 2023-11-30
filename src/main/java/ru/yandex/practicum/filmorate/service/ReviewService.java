@@ -37,4 +37,8 @@ public class ReviewService {
 
         return reviewStorage.updateReview(review);
     }
+
+    public void deleteReview(Long id) {
+        reviewStorage.deleteReviewById(id);
+    }
 }

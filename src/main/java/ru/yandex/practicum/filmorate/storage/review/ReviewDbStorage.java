@@ -72,6 +72,15 @@ public class ReviewDbStorage implements ReviewStorage {
                 .orElseThrow(() -> new DataNotFoundException(String.format("Не найден отзыв с id %s", id)));
     }
 
+    @Override
+    public void deleteReviewById(long id) {
+        String sqlQuery = "DELETE FROM reviews WHERE review_id = ?";
+
+        jdbcTemplate.update(sqlQuery, id);
+
+        log.info("Удалён отзыв по id: {}", id);
+    }
+
     public static Review buildReview(ResultSet rs, int rowNum) throws SQLException {
         return Review.builder()
                 .reviewId(rs.getLong("review_id"))
