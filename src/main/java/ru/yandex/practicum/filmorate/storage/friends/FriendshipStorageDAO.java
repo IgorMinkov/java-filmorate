@@ -14,7 +14,7 @@ import java.util.*;
 @Component
 @Qualifier
 @RequiredArgsConstructor
-public class FriendshipStorageDAO implements  FriendshipStorage {
+public class FriendshipStorageDAO implements FriendshipStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
