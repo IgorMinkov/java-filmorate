@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.*;
 
 @Slf4j
@@ -41,6 +42,13 @@ public class FilmController {
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен фильм для обновления: {}", film);
         return filmService.updateFilm(film);
+    }
+
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable("filmId") Long filmId) {
+        log.info("Получен DELETE-запрос /films/{}", filmId);
+        log.info("Отправлен ответ на PUT-запрос /films/{}", filmId);
+        filmService.delete(filmId);
     }
 
     @PutMapping("/{id}/like/{userId}")

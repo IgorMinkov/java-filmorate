@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.*;
 
 @Slf4j
@@ -41,6 +42,13 @@ public class UserController {
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Получен пользователь для обновления: {}", user);
         return userService.updateUser(user);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable("userId") Long userId) {
+        log.info("Получен DELETE-запрос /users/{}", userId);
+        userService.delete(userId);
+        log.info("Отправлен ответ на DELETE-запрос /users/{}", userId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

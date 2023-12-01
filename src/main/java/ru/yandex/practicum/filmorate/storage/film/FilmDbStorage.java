@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -81,6 +82,17 @@ public class FilmDbStorage implements FilmStorage {
         genreStorage.updateFilmGenres(film);
         log.info("Обновлен фильм: {}", film);
         return film;
+    }
+
+    @Override
+    public void delete(Long filmId) {
+        String sqlQuery = "DELETE FROM films " +
+                "WHERE film_id = ?";
+        try {
+            jdbcTemplate.update(sqlQuery, filmId);
+        } catch (DataAccessException e) {
+            throw new DataNotFoundException("Фильм не найден" + e.getMessage());
+        }
     }
 
     @Override

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -63,6 +64,23 @@ public class UserDbStorage implements UserStorage {
                 user.getId());
         log.info("Обновлен пользователь: {}", user);
         return user;
+    }
+
+    @Override
+    public void delete(Long userId) {
+        String sqlQueryDeleteLike = "DELETE FROM likes " +
+                "WHERE user_id = ?";
+        String sqlQueryDeleteFriendship = "DELETE FROM friendship " +
+                "WHERE user_id AND friend_id IN(?)";
+        String sqlQueryDeleteUser = "DELETE FROM users " +
+                "WHERE user_id = ?";
+        try {
+            jdbcTemplate.update(sqlQueryDeleteLike, userId);
+            jdbcTemplate.update(sqlQueryDeleteFriendship, userId);
+            jdbcTemplate.update(sqlQueryDeleteUser, userId);
+        } catch (DataAccessException e) {
+            throw new DataNotFoundException("Пользователь не найден" + e.getMessage());
+        }
     }
 
     @Override
