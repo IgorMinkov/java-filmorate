@@ -16,7 +16,7 @@ public class DirectorService {
         return directorStorage.getAll();
     }
 
-    public Director getById(long directorId) {
+    public Director getById(Long directorId) {
         return directorStorage.getById(directorId);
     }
 
@@ -28,7 +28,7 @@ public class DirectorService {
         return directorStorage.updateDirector(director);
     }
 
-    public void deleteDirector(long directorId) {
+    public void deleteDirector(Long directorId) {
         directorStorage.deleteDirector(directorId);
     }
 }

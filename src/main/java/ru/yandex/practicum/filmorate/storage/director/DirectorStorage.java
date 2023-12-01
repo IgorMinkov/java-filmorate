@@ -9,9 +9,9 @@ import java.util.Set;
 public interface DirectorStorage {
     List<Director> getAll();
 
-    Set<Director> getByFilmId(long filmId);
+    Set<Director> getByFilmId(Long filmId);
 
-    Director getById(long directorId);
+    Director getById(Long directorId);
 
     Director createDirector(Director director);
 
@@ -19,5 +19,5 @@ public interface DirectorStorage {
 
     Director updateDirector(Director director);
 
-    void deleteDirector(long directorId);
+    void deleteDirector(Long directorId);
 }
