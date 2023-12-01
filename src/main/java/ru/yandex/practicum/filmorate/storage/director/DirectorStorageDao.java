@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.director;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,10 +12,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -30,14 +28,14 @@ public class DirectorStorageDao implements DirectorStorage {
     }
 
     @Override
-    public Set<Director> getByFilmId(long filmId) {
+    public Set<Director> getByFilmId(Long filmId) {
         String sqlQuery = "SELECT d.* FROM film_directors df JOIN directors d ON df.director_id = d.id " +
                 "WHERE df.film_id = ?";
         return new HashSet<>(jdbcTemplate.query(sqlQuery, DirectorStorageDao::buildDirector, filmId));
     }
 
     @Override
-    public Director getById(long directorId) {
+    public Director getById(Long directorId) {
         String sqlQuery = "SELECT * FROM directors WHERE id = ?";
         return jdbcTemplate.query(sqlQuery, DirectorStorageDao::buildDirector, directorId).stream()
                 .findAny()
@@ -61,10 +59,20 @@ public class DirectorStorageDao implements DirectorStorage {
         String sqlQuery = "DELETE FROM film_directors WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId());
         if (Objects.nonNull(film.getDirectors()) && !film.getDirectors().isEmpty()) {
-            for (Director director : film.getDirectors()) {
-                String sqlQueryInsert = "INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)";
-                jdbcTemplate.update(sqlQueryInsert, film.getId(), director.getId());
-            }
+            List<Director> directors = new ArrayList<>(film.getDirectors());
+            jdbcTemplate.batchUpdate("INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)",
+                    new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setLong(1, film.getId());
+                    ps.setLong(2, directors.get(i).getId());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return directors.size();
+                }
+            });
         }
     }
 
@@ -80,7 +88,7 @@ public class DirectorStorageDao implements DirectorStorage {
     }
 
     @Override
-    public void deleteDirector(long directorId) {
+    public void deleteDirector(Long directorId) {
         String sqlQuery = "DELETE FROM directors WHERE id = ? ";
         int rowsUpdated = jdbcTemplate.update(sqlQuery, directorId);
         if (rowsUpdated != 1) {
