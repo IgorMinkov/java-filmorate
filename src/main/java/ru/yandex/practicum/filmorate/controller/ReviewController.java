@@ -73,7 +73,7 @@ public class ReviewController {
     }
 
     @PutMapping("{id}/like/{userId}")
-    public void addLikeToReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void addLikeToReview(@Positive @PathVariable Long id, @Positive @PathVariable Long userId) {
         log.info("Получен запрос на добавление лайка к отзыву: {} от пользователя: {}", id, userId);
 
         reviewRatingService.create(ReviewRating.builder()
@@ -84,7 +84,7 @@ public class ReviewController {
     }
 
     @PutMapping("{id}/dislike/{userId}")
-    public void addDislikeToReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void addDislikeToReview(@Positive @PathVariable Long id, @Positive @PathVariable Long userId) {
         log.info("Получен запрос на добавление дизлайка к отзыву: {} от пользователя: {}", id, userId);
 
         reviewRatingService.create(ReviewRating.builder()
@@ -95,7 +95,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("{id}/like/{userId}")
-    public void removeLikeFromReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void removeLikeFromReview(@Positive @PathVariable Long id, @Positive @PathVariable Long userId) {
         log.info("Получен запрос на удаление лайка из отзыва: {} от пользователя: {}", id, userId);
 
         reviewRatingService.delete(ReviewRating.builder()
@@ -106,7 +106,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("{id}/dislike/{userId}")
-    public void removeDislikeFromReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void removeDislikeFromReview(@Positive @PathVariable Long id, @Positive @PathVariable Long userId) {
         log.info("Получен запрос на удаление дизлайка из отзыва: {} от пользователя: {}", id, userId);
 
         reviewRatingService.delete(ReviewRating.builder()
