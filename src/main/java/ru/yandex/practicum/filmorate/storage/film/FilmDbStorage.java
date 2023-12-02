@@ -135,7 +135,7 @@ public class FilmDbStorage implements FilmStorage {
                 "JOIN FILMS f ON f.FILM_ID = df.FILM_ID " +
                 "JOIN MPA_RATING mr ON mr.ID = f.MPA_RATING " +
                 "WHERE d.ID = ?" +
-                "ORDER BY EXTRACT f.RELEASE_DATE ASC";
+                "ORDER BY f.RELEASE_DATE ASC";
         log.info("Получение фильмов режиссера с id {} с сортировкой по годам", directorId);
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, directorId).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
