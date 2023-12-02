@@ -76,7 +76,7 @@ public class FilmService {
 
     public List<Film> getSortedFilmByDirector(Long directorId, String sortMethod) {
         List<Film> films;
-        switch (sortMethod) {
+        switch (sortMethod.toLowerCase()) {
             case "year":
                 films = filmStorage.getDirectorFilmsSortByYear(directorId);
                 break;
@@ -88,9 +88,8 @@ public class FilmService {
         }
         if (films.isEmpty()) {
             throw new DataNotFoundException("Отсутствуют фильмы указанного режиссера");
-        } else {
-            return films;
         }
+        return films;
     }
 
     private void validateFilm(Long id) {

@@ -51,6 +51,7 @@ public class DirectorStorageDao implements DirectorStorage {
             statement.setString(1, director.getName());
             return statement;
         }, keyHolder);
+        log.info("Режиссер с id {} успешно создан", director.getId());
         return getById(Objects.requireNonNull(keyHolder.getKey()).longValue());
     }
 
@@ -66,6 +67,7 @@ public class DirectorStorageDao implements DirectorStorage {
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
                     ps.setLong(1, film.getId());
                     ps.setLong(2, directors.get(i).getId());
+                    log.info("Для фильма с id {} добавлен режиссер с id {}", film.getId(), directors.get(i).getId());
                 }
 
                 @Override
@@ -81,9 +83,11 @@ public class DirectorStorageDao implements DirectorStorage {
         String sqlQuery = "UPDATE directors SET name = ? WHERE id = ?";
         int rowsUpdated = jdbcTemplate.update(sqlQuery, director.getName(), director.getId());
         if (rowsUpdated == 1) {
+            log.info("Режиссер {} успешно обновлен", director.getId());
             return getById(director.getId());
         } else {
-            throw new DataNotFoundException("Директор с id " + director.getId() + " не найден");
+            log.info("Произошла ошибка при обновлении режиссера {}", director.getId());
+            throw new DataNotFoundException("Режиссер с id " + director.getId() + " не найден");
         }
     }
 
@@ -92,8 +96,10 @@ public class DirectorStorageDao implements DirectorStorage {
         String sqlQuery = "DELETE FROM directors WHERE id = ? ";
         int rowsUpdated = jdbcTemplate.update(sqlQuery, directorId);
         if (rowsUpdated != 1) {
-            throw new DataNotFoundException("Директор с id " + directorId + " не найден");
+            log.info("Режиссер с {} не найден", directorId);
+            throw new DataNotFoundException("Режиссер с id " + directorId + " не найден");
         }
+        log.info("Режиссер с {} успешно удален", directorId);
     }
 
     private static Director buildDirector(ResultSet rs, int rowNum) throws SQLException {
