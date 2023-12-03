@@ -35,6 +35,8 @@ public class Film {
 
     private Set<Long> likes = new HashSet<>();
 
+    private Set<Director> directors = new HashSet<>();
+
     public long getLikesCount() {
         if (likes == null) {
             return 0;

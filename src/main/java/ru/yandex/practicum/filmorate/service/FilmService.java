@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -73,10 +74,29 @@ public class FilmService {
         return filmStorage.getPopular(count);
     }
 
+
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         userService.validateUser(userId);
         userService.validateUser(friendId);
         return filmStorage.getCommon(userId, friendId);
+    }
+
+    public List<Film> getSortedFilmByDirector(Long directorId, String sortMethod) {
+        List<Film> films;
+        switch (sortMethod.toLowerCase()) {
+            case "year":
+                films = filmStorage.getDirectorFilmsSortByYear(directorId);
+                break;
+            case "likes":
+                films = filmStorage.getDirectorFilmsSortByLikes(directorId);
+                break;
+            default:
+                throw new DataNotFoundException("Данный метод сортировки не поддерживается");
+        }
+        if (films.isEmpty()) {
+            throw new DataNotFoundException("Отсутствуют фильмы указанного режиссера");
+        }
+        return films;
     }
 
     private void validateFilm(Long id) {
