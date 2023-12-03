@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -69,5 +69,10 @@ public class FilmController {
         return filmService.getSortedFilmByDirector(directorId, sortMethod);
     }
 
+    @GetMapping("/search")
+    public List<Film> getSearchResults(@RequestParam(required = false, name = "query") String query,
+                                       @RequestParam(required = false, name = "by") String params) {
+        return filmService.getSearchResults(query, params);
+    }
 }
 

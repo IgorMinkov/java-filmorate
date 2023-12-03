@@ -96,4 +96,8 @@ public class FilmService {
         filmStorage.checkFilm(id);
     }
 
+    public List<Film> getSearchResults(String query, String params) {
+        String[] paramsList = params.split(",");
+        return filmStorage.getSearchResults(query, paramsList);
+    }
 }
