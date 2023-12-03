@@ -18,4 +18,7 @@ public interface FilmStorage {
 
     void checkFilm(Long id);
 
+    List<Film> getDirectorFilmsSortByYear(long directorId);
+
+    List<Film> getDirectorFilmsSortByLikes(long directorId);
 }
