@@ -189,6 +189,7 @@ public class FilmDbStorage implements FilmStorage {
         sqlArgs.add(limit);
         return jdbcTemplate.query(resultQuery, FilmDbStorage::buildFilm, sqlArgs.toArray()).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
                 .collect(Collectors.toList());
     }
 }
