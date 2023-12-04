@@ -21,10 +21,14 @@ public class UserService {
 
     private final FriendshipStorage friendshipStorage;
 
+    private final FilmService filmService;
+
     @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage, FriendshipStorage friendshipStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
+                       FriendshipStorage friendshipStorage, FilmService filmService) {
         this.userStorage = userStorage;
         this.friendshipStorage = friendshipStorage;
+        this.filmService = filmService;
     }
 
     public List<User> getAllUsers() {
@@ -82,7 +86,7 @@ public class UserService {
 
     public List<Film> getRecommendations(Long userId) {
         validateUser(userId);
-        return new ArrayList<>();
+        return filmService.getRecommendations(userId);
     }
 
     protected void validateUser(Long id) {

@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -90,6 +91,11 @@ public class FilmService {
             throw new DataNotFoundException("Отсутствуют фильмы указанного режиссера");
         }
         return films;
+    }
+
+    public List<Film> getRecommendations(Long userId) {
+        userService.validateUser(userId);
+        return new ArrayList<>();
     }
 
     private void validateFilm(Long id) {
