@@ -94,7 +94,11 @@ public class FilmService {
     }
 
     public List<Film> getRecommendations(Long userId) {
-        userService.validateUser(userId);
+        List<Long> userFilms = likesStorage.getLikedFilmsId(userId);
+        if (userFilms.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         return new ArrayList<>();
     }
 

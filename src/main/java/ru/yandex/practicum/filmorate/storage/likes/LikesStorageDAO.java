@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @Qualifier("likesStorageDAO")
@@ -25,6 +27,12 @@ public class LikesStorageDAO implements LikesStorage {
     public void removeLike(Long userId, Long filmId) {
         String sqlQuery = "DELETE FROM likes WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
+    }
+
+    @Override
+    public List<Long> getLikedFilmsId(Long userId) {
+        String sqlQuery = "SELECT film_id FROM Likes WHERE user_id = ?";
+        return jdbcTemplate.queryForList(sqlQuery, Long.class, userId);
     }
 
 }
