@@ -10,4 +10,6 @@ public interface LikesStorage {
 
     List<Long> getLikedFilmsId(Long userId);
 
+    Long getSameLikesUserId(Long userId);
+
 }

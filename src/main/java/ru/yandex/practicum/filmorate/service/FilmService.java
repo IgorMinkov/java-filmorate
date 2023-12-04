@@ -98,6 +98,7 @@ public class FilmService {
         if (userFilms.isEmpty()) {
             return new ArrayList<>();
         }
+        Long sameTasteUserId = likesStorage.getSameLikesUserId(userId);
 
         return new ArrayList<>();
     }
