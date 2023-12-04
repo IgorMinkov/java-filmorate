@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -17,9 +18,12 @@ public class UserController {
 
     private final UserService userService;
 
+    private final FilmService filmService;
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FilmService filmService) {
         this.userService = userService;
+        this.filmService = filmService;
     }
 
     @GetMapping
@@ -69,7 +73,7 @@ public class UserController {
     @GetMapping("/{id}/recommendations")
     public List<Film> getRecommendations (@PathVariable("id") Long userId) {
         log.info("Запрошены рекомендации для пользователя с id: {}", userId);
-        return userService.getRecommendations(userId);
+        return filmService.getRecommendations(userId);
     }
 
 }
