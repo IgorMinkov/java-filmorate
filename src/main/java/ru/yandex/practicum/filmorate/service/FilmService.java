@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -98,7 +99,10 @@ public class FilmService {
         if (userFilms.isEmpty()) {
             return new ArrayList<>();
         }
+
         Long sameTasteUserId = likesStorage.getSameLikesUserId(userId);
+        List<Long> recommendFilmIds = likesStorage.getLikedFilmsId(sameTasteUserId).stream()
+                .filter(filmId -> !userFilms.contains(filmId)).collect(Collectors.toList());
 
         return new ArrayList<>();
     }
