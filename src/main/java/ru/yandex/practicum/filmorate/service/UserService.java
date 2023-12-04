@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friends.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -77,6 +78,11 @@ public class UserService {
         return getFriendList(id).stream()
                 .filter(x -> getFriendList(otherId).contains(x))
                 .collect(Collectors.toList());
+    }
+
+    public List<Film> getRecommendations(Long userId) {
+        validateUser(userId);
+        return new ArrayList<>();
     }
 
     protected void validateUser(Long id) {
