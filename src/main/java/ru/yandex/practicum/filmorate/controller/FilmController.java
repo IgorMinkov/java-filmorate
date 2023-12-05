@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -15,10 +16,12 @@ import java.util.*;
 public class FilmController {
 
     private final FilmService filmService;
+    private final EventService eventService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, EventService eventService) {
         this.filmService = filmService;
+        this.eventService = eventService;
     }
 
     @GetMapping
@@ -46,12 +49,14 @@ public class FilmController {
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Фильму с id: {} ставит лайк пользователь с id : {}", id, userId);
+        eventService.addEvent(userId, id, "LIKE", "ADD");
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Фильму с id: {} удаляет лайк пользователь с id : {}", id, userId);
+        eventService.addEvent(userId, id, "LIKE", "REMOVE");
         filmService.removeLike(id, userId);
     }
 
@@ -70,4 +75,3 @@ public class FilmController {
     }
 
 }
-
