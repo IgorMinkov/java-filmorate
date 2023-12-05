@@ -72,10 +72,12 @@ public class UserDbStorage implements UserStorage {
         String sqlQueryDeleteFriendship = "DELETE FROM friendship WHERE user_id AND friend_id IN(?)";
         String sqlQueryDeleteUser = "DELETE FROM users WHERE user_id = ?";
         String sqlQueryDeleteReviews = "DELETE FROM reviews WHERE user_id = ?";
+        String sqlQueryDeleteLikeReviews = "DELETE FROM review_rating WHERE user_id = ?";
         try {
             jdbcTemplate.update(sqlQueryDeleteLike, userId);
             jdbcTemplate.update(sqlQueryDeleteFriendship, userId);
             jdbcTemplate.update(sqlQueryDeleteReviews, userId);
+            jdbcTemplate.update(sqlQueryDeleteLikeReviews, userId);
             jdbcTemplate.update(sqlQueryDeleteUser, userId);
         } catch (DataAccessException e) {
             throw new DataNotFoundException("Пользователь не найден" + e.getMessage());
