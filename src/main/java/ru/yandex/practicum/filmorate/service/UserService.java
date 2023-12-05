@@ -58,13 +58,13 @@ public class UserService {
     public void addFriend(Long id, Long friendId) {
         validateUser(id);
         validateUser(friendId);
-        friendshipStorage.addFriend(id,friendId);
+        friendshipStorage.addFriend(id, friendId);
     }
 
     public void deleteFriend(Long id, Long friendId) {
         validateUser(id);
         validateUser(friendId);
-        friendshipStorage.deleteFriend(id,friendId);
+        friendshipStorage.deleteFriend(id, friendId);
     }
 
     public List<User> getFriendList(Long id) {

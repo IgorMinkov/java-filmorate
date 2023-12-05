@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaRatingStorage;
 
@@ -34,11 +35,15 @@ public class FilmDbStorage implements FilmStorage {
 
     private final MpaRatingStorage mpaStorage;
 
+    private final DirectorStorage directorStorage;
+
+
     @Override
     public List<Film> getAll() {
         String sqlQuery = "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -62,9 +67,10 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql, film.getMpaRating().getId(), film.getId());
 
         genreStorage.updateFilmGenres(film);
+        directorStorage.updateFilmDirectors(film);
         checkFilm(film.getId());
         log.info("Создан фильм: {}", film);
-        return film;
+        return getById(keyHolder.getKey().longValue());
     }
 
     @Override
@@ -80,8 +86,9 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpaRating().getId(),
                 film.getId());
         genreStorage.updateFilmGenres(film);
+        directorStorage.updateFilmDirectors(film);
         log.info("Обновлен фильм: {}", film);
-        return film;
+        return getById(film.getId());
     }
 
     @Override
@@ -102,6 +109,7 @@ public class FilmDbStorage implements FilmStorage {
         Film film = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, id).stream()
                 .findAny().orElseThrow(() -> new DataNotFoundException("не найден фильм с id" + id));
         film.setGenres(genreStorage.getFilmGenres(id));
+        film.setDirectors(directorStorage.getByFilmId(id));
         return film;
     }
 
@@ -115,6 +123,7 @@ public class FilmDbStorage implements FilmStorage {
                 " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC LIMIT (?)";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, limit).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -131,6 +140,38 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public List<Film> getDirectorFilmsSortByYear(long directorId) {
+        String sqlQuery = "SELECT f.*, mr.* FROM DIRECTORS d " +
+                "JOIN FILM_DIRECTORS df ON d.ID = df.DIRECTOR_ID " +
+                "JOIN FILMS f ON f.FILM_ID = df.FILM_ID " +
+                "JOIN MPA_RATING mr ON mr.ID = f.MPA_RATING " +
+                "WHERE d.ID = ?" +
+                "ORDER BY f.RELEASE_DATE ASC";
+        log.info("Получение фильмов режиссера с id {} с сортировкой по годам", directorId);
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, directorId).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Film> getDirectorFilmsSortByLikes(long directorId) {
+        String sqlQuery = "SELECT f.*, mr.* FROM DIRECTORS d " +
+                "JOIN FILM_DIRECTORS df ON d.ID = df.DIRECTOR_ID " +
+                "JOIN FILMS f ON df.FILM_ID = f.FILM_ID " +
+                "LEFT OUTER JOIN LIKES l ON f.FILM_ID = l.FILM_ID " +
+                "JOIN MPA_RATING mr ON f.MPA_RATING = mr.ID " +
+                "WHERE d.ID = ? " +
+                "GROUP BY f.FILM_ID " +
+                "ORDER BY COUNT(l.USER_ID) DESC";
+        log.info("Получение фильмов режиссера с id {} с сортировкой по лайкам", directorId);
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, directorId).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
+                .collect(Collectors.toList());
+    }
+
     private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
         return Film.builder()
                 .id(rs.getLong("film_id"))
@@ -144,7 +185,6 @@ public class FilmDbStorage implements FilmStorage {
                         .build())
                 .build();
     }
-
 
 
 }
