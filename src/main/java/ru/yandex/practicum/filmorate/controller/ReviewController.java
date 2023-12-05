@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.ReviewRating;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.ReviewRatingService;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
@@ -32,25 +33,31 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 public class ReviewController {
     private final ReviewService reviewService;
     private final ReviewRatingService reviewRatingService;
+    private final EventService eventService;
 
     @PostMapping
     public Review createReview(@Valid @RequestBody Review review) {
         log.info("Получен запрос на добавление нового отзыва: {}", review);
 
-        return reviewService.createReview(review);
+        Review createdReview = reviewService.createReview(review);
+        eventService.addEvent(createdReview.getUserId(), createdReview.getReviewId(), "REVIEW", "ADD");
+        return createdReview;
     }
 
     @PutMapping
     public Review updateReview(@Valid @RequestBody Review review) {
         log.info("Получен запрос на обновление имеющегося отзыва: {}", review);
 
-        return reviewService.updateReview(review);
+        Review updatedReview = reviewService.updateReview(review);
+        eventService.addEvent(updatedReview.getUserId(), updatedReview.getReviewId(), "REVIEW", "UPDATE");
+        return updatedReview;
     }
 
     @DeleteMapping("/{id}")
     public void deleteReview(@Positive @PathVariable Long id) {
         log.info("Получен запрос на удаление отзыва по id: {}", id);
 
+        eventService.addEvent(reviewService.getReviewById(id).getUserId(), id, "REVIEW", "REMOVE");
         reviewService.deleteReview(id);
     }
 
