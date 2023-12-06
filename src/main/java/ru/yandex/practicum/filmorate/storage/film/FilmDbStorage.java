@@ -205,7 +205,7 @@ public class FilmDbStorage implements FilmStorage {
         if (!sqlConditions.isEmpty()) {
             sqlQuery += " WHERE " + String.join(" OR ", sqlConditions);
         }
-        sqlQuery += " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC";
+        sqlQuery += " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id DESC";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, sqlArgs.toArray()).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
                 .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
