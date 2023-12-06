@@ -5,7 +5,11 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,11 +46,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopular(Integer limit) {
+    public List<Film> getPopular(Long genreId, String year, Integer limit) {
         return getAll().stream()
                 .sorted(Comparator.comparingLong(Film::getLikesCount).reversed())
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Film> getCommon(Long userId, Long friendId) {
+        return new ArrayList<>();
     }
 
     @Override
@@ -64,6 +73,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getDirectorFilmsSortByLikes(long directorId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getSearchResults(String query, String[] paramsList) {
         return null;
     }
 

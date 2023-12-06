@@ -54,24 +54,27 @@ public class FilmService {
         return filmStorage.getById(id);
     }
 
-    public void addLike(Long id, Long userId) {
-        validateFilm(id);
+    public void addLike(Long filmId, Long userId) {
+        validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.addLike(id, userId);
+        likesStorage.addLike(userId, filmId);
     }
 
-    public void removeLike(Long id, Long userId) {
-        validateFilm(id);
+    public void removeLike(Long filmId, Long userId) {
+        validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.removeLike(id, userId);
+        likesStorage.removeLike(userId, filmId);
     }
 
-    public List<Film> getPopularFilms(Integer count) {
-        if (count == null || count <= 0) {
-            throw new ValidationException(
-                    String.format("в метод getPopularFilms передан некорретный параметр: %d", count));
-        }
-        return filmStorage.getPopular(count);
+    private void validateFilm(Long id) {
+        filmStorage.checkFilm(id);
+    }
+
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        userService.validateUser(userId);
+        userService.validateUser(friendId);
+        return filmStorage.getCommon(userId, friendId);
     }
 
     public List<Film> getSortedFilmByDirector(Long directorId, String sortMethod) {
@@ -92,8 +95,17 @@ public class FilmService {
         return films;
     }
 
-    private void validateFilm(Long id) {
-        filmStorage.checkFilm(id);
+    public List<Film> getPopularFilms(Long genreId, String year, Integer limit) {
+        if (limit == null || limit <= 0) {
+            throw new ValidationException(
+                    String.format("в метод getPopularFilms передан некорректный параметр: %d", limit));
+        }
+            return filmStorage.getPopular(genreId, year, limit);
+    }
+
+    public List<Film> getSearchResults(String query, String params) {
+        String[] paramsList = params.split(",");
+        return filmStorage.getSearchResults(query, paramsList);
     }
 
 }
