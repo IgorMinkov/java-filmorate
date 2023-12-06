@@ -130,6 +130,7 @@ public class FilmDbStorage implements FilmStorage {
         log.debug("Получены общие фильмы у пользователей с id {} и {}.", userId, friendId);
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, userId, friendId).stream()
                 .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
                 .collect(Collectors.toList());
     }
 
