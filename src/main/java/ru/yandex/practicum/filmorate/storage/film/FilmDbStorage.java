@@ -118,20 +118,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopular(Integer limit) {
-        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration," +
-                " f.mpa_rating, m.rating_name" +
-                " FROM films f" +
-                " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
-                " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
-                " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id DESC LIMIT (?)";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, limit).stream()
-                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
-                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public void checkFilm(Long id) {
         try {
             Film film = getById(id);
@@ -224,7 +210,7 @@ public class FilmDbStorage implements FilmStorage {
                 " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
                 " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
                 " LEFT JOIN film_genres g ON f.film_id = g.film_id ";
-        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC LIMIT (?)";
+        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id DESC LIMIT (?)";
         String sqlCondition = String.join(" and ", sqlConditions);
         if (!sqlCondition.isEmpty()) {
             sqlCondition = "WHERE " + sqlCondition;

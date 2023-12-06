@@ -68,10 +68,6 @@ public class FilmService {
         likesStorage.removeLike(id, userId);
     }
 
-    private void validateFilm(Long id) {
-        filmStorage.checkFilm(id);
-    }
-
     public List<Film> getSortedFilmByDirector(Long directorId, String sortMethod) {
         List<Film> films;
         switch (sortMethod.toLowerCase()) {
