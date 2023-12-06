@@ -18,14 +18,14 @@ public class LikesStorageDAO implements LikesStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addLike(Long userId, Long filmId) {
+    public void addLike(Long filmId, Long userId) {
         String sqlQuery = "INSERT INTO likes (user_id, film_id) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
         log.info("пользователю с id {} нравится фильм с id {}", userId, filmId);
     }
 
     @Override
-    public void removeLike(Long userId, Long filmId) {
+    public void removeLike(Long filmId, Long userId) {
         String sqlQuery = "DELETE FROM likes WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
@@ -48,7 +48,7 @@ public class LikesStorageDAO implements LikesStorage {
 
         return jdbcTemplate.queryForList(sqlQuery, Long.class, userId).stream()
                 .findFirst().orElseThrow(() ->
-                        new DataNotFoundException("не найдено пересечений по лайкам пользователя с id" + userId));
+                        new DataNotFoundException("не найдено пересечений по лайкам пользователя с id " + userId));
     }
 
 }

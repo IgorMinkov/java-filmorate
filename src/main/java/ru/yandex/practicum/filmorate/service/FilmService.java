@@ -109,15 +109,13 @@ public class FilmService {
         if (recommendFilmIds.isEmpty()) {
             return new ArrayList<>();
         }
-
-            System.out.println(recommendFilmIds);
-            List<Film> recommendations = new ArrayList<>();
-            for (Long id : recommendFilmIds) {
-                Film film = getFilmById(id);
-                recommendations.add(film);
-            }
-            return recommendations;
-//        return recommendFilmIds.stream().map(this::getFilmById).collect(Collectors.toList());
+        List<Film> recommendations = new ArrayList<>();
+        for (Long id : recommendFilmIds) {
+            Film film = getFilmById(id);
+            recommendations.add(film);
+        }
+        return recommendations;
+//      return recommendFilmIds.stream().map(this::getFilmById).collect(Collectors.toList());
     }
 
     private void validateFilm(Long id) {
