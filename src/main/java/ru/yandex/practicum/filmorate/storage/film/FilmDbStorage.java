@@ -118,6 +118,25 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getCommon(Long userId, Long friendId) {
+        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, " +
+                "f.mpa_rating, m.rating_name " +
+                "FROM films f " +
+                "LEFT OUTER JOIN likes ul ON f.film_id = ul.film_id " +
+                "LEFT OUTER JOIN likes fl ON f.film_id = fl.film_id " +
+                "LEFT JOIN mpa_rating m ON f.mpa_rating = m.id " +
+                "WHERE ul.user_id = ? AND fl.user_id = ? " +
+                "GROUP BY f.film_id " +
+                "ORDER BY COUNT(ul.user_id), f.film_id DESC";
+
+        log.debug("Получены общие фильмы у пользователей с id {} и {}.", userId, friendId);
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, userId, friendId).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void checkFilm(Long id) {
         try {
             Film film = getById(id);
@@ -210,7 +229,7 @@ public class FilmDbStorage implements FilmStorage {
                 " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
                 " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
                 " LEFT JOIN film_genres g ON f.film_id = g.film_id ";
-        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC LIMIT (?)";
+        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id DESC LIMIT (?)";
         String sqlCondition = String.join(" and ", sqlConditions);
         if (!sqlCondition.isEmpty()) {
             sqlCondition = "WHERE " + sqlCondition;
