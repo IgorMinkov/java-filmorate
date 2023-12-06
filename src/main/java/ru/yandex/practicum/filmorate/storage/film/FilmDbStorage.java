@@ -53,20 +53,6 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
-    private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(rs.getLong("film_id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getLong("duration"))
-                .mpaRating(MpaRating.builder()
-                        .id(rs.getInt("mpa_rating"))
-                        .name(rs.getString("rating_name"))
-                        .build())
-                .build();
-    }
-
     @Override
     public List<Film> getAll() {
         String sqlQuery = "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
@@ -202,6 +188,9 @@ public class FilmDbStorage implements FilmStorage {
         }
         sqlQuery += " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, sqlArgs.toArray()).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
+                .collect(Collectors.toList());
       }
 
     public List<Film> getPopular(Long genreId, String year, Integer limit) {
@@ -233,5 +222,4 @@ public class FilmDbStorage implements FilmStorage {
                 .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
                 .collect(Collectors.toList());
     }
-  
 }
