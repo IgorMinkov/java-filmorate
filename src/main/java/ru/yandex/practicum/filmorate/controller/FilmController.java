@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -23,10 +24,12 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
+    private final EventService eventService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, EventService eventService) {
         this.filmService = filmService;
+        this.eventService = eventService;
     }
 
     @GetMapping
@@ -55,12 +58,14 @@ public class FilmController {
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Фильму с id: {} ставит лайк пользователь с id : {}", id, userId);
         filmService.addLike(id, userId);
+        eventService.addEvent(userId, id, "LIKE", "ADD");
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Фильму с id: {} удаляет лайк пользователь с id : {}", id, userId);
         filmService.removeLike(id, userId);
+        eventService.addEvent(userId, id, "LIKE", "REMOVE");
     }
 
     @GetMapping("/popular")
@@ -69,6 +74,11 @@ public class FilmController {
                                       @RequestParam(name = "year", required = false) String year,
                                       @RequestParam(name = "genreId", required = false) Long genreId) {
         return filmService.getPopularFilms(genreId, year, count);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
     }
 
     @GetMapping("/director/{directorId}")
@@ -85,4 +95,3 @@ public class FilmController {
         return filmService.getSearchResults(query, params);
     }
 }
-

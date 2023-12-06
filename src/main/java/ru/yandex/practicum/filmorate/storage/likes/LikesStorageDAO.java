@@ -27,6 +27,7 @@ public class LikesStorageDAO implements LikesStorage {
     public void removeLike(Long filmId, Long userId) {
         String sqlQuery = "DELETE FROM likes WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
+        log.info("пользователь с id {} удаляет лайк с фильма с id {}", userId, filmId);
     }
 
     @Override
