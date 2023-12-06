@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Film getById(Long id);
 
-    List<Film> getPopular(Integer limit);
+    List<Film> getPopular(Long genreId, String year, Integer limit);
 
     List<Film> getCommon(Long userId, Long friendId);
 
@@ -23,4 +23,6 @@ public interface FilmStorage {
     List<Film> getDirectorFilmsSortByYear(long directorId);
 
     List<Film> getDirectorFilmsSortByLikes(long directorId);
+
+    List<Film> getSearchResults(String query, String[] paramsList);
 }
