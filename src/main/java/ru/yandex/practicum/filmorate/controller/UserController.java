@@ -20,15 +20,11 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
-  
     private final EventService eventService;
-  
     private final FilmService filmService;
 
     @Autowired
-    public UserController(UserService userService, 
-                          FilmService filmService,
-                         EventService eventService) {
+    public UserController(UserService userService, FilmService filmService, EventService eventService) {
         this.userService = userService;
         this.filmService = filmService;
         this.eventService = eventService;

@@ -59,15 +59,15 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) {
         validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.addLike(userId, filmId);
+        likesStorage.addLike(filmId, userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
         validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.removeLike(userId, filmId);
+        likesStorage.removeLike(filmId, userId);
     }
-  
+
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         userService.validateUser(userId);
         userService.validateUser(friendId);
