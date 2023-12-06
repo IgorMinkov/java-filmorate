@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -37,7 +38,6 @@ public class FilmDbStorage implements FilmStorage {
     private final MpaRatingStorage mpaStorage;
 
     private final DirectorStorage directorStorage;
-
 
     private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
         return Film.builder()
@@ -163,6 +163,36 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getSearchResults(String query, String[] paramsList) {
+        List<Object> sqlArgs = new ArrayList<>();
+        List<String> sqlConditions = new ArrayList<>();
+        HashMap<String, String> searchConditions = new HashMap<>();
+        searchConditions.put("director", "d.name iLike CONCAT('%',?,'%')");
+        searchConditions.put("title", "f.name iLike CONCAT('%',?,'%')");
+        for (String param : paramsList) {
+            if (searchConditions.containsKey(param)) {
+                sqlConditions.add(searchConditions.get(param));
+                sqlArgs.add(query);
+            }
+        }
+        String sqlQuery = "select f.film_id, f.name, f.description, f.release_date, f.duration," +
+                " f.mpa_rating, m.rating_name" +
+                " from films f " +
+                " LEFT JOIN film_directors fd ON f.film_id = fd.film_id " +
+                " LEFT JOIN directors d ON d.id = fd.director_id " +
+                " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
+                " LEFT JOIN film_genres g ON f.film_id = g.film_id" +
+                " LEFT OUTER JOIN likes l ON l.film_id = f.film_id";
+        if (!sqlConditions.isEmpty()) {
+            sqlQuery += " WHERE " + String.join(" OR ", sqlConditions);
+        }
+        sqlQuery += " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC";
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, sqlArgs.toArray()).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
+                .collect(Collectors.toList());
+      }
+
     public List<Film> getPopular(Long genreId, String year, Integer limit) {
         List<Object> sqlArgs = new ArrayList<>();
         List<String> sqlConditions = new ArrayList<>();

@@ -95,4 +95,10 @@ public class FilmService {
         }
             return filmStorage.getPopular(genreId, year, limit);
     }
+
+    public List<Film> getSearchResults(String query, String params) {
+        String[] paramsList = params.split(",");
+        return filmStorage.getSearchResults(query, paramsList);
+    }
+
 }
