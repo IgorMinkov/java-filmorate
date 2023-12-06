@@ -68,12 +68,8 @@ public class FilmService {
         likesStorage.removeLike(id, userId);
     }
 
-    public List<Film> getPopularFilms(Integer count) {
-        if (count == null || count <= 0) {
-            throw new ValidationException(
-                    String.format("в метод getPopularFilms передан некорретный параметр: %d", count));
-        }
-        return filmStorage.getPopular(count);
+    private void validateFilm(Long id) {
+        filmStorage.checkFilm(id);
     }
 
     public List<Film> getSortedFilmByDirector(Long directorId, String sortMethod) {
@@ -114,6 +110,19 @@ public class FilmService {
 
     private void validateFilm(Long id) {
         filmStorage.checkFilm(id);
+    }
+
+    public List<Film> getPopularFilms(Long genreId, String year, Integer limit) {
+        if (limit == null || limit <= 0) {
+            throw new ValidationException(
+                    String.format("в метод getPopularFilms передан некорректный параметр: %d", limit));
+        }
+            return filmStorage.getPopular(genreId, year, limit);
+    }
+
+    public List<Film> getSearchResults(String query, String params) {
+        String[] paramsList = params.split(",");
+        return filmStorage.getSearchResults(query, paramsList);
     }
 
 }

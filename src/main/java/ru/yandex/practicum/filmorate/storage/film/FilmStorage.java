@@ -14,11 +14,13 @@ public interface FilmStorage {
 
     Film getById(Long id);
 
-    List<Film> getPopular(Integer limit);
+    List<Film> getPopular(Long genreId, String year, Integer limit);
 
     void checkFilm(Long id);
 
     List<Film> getDirectorFilmsSortByYear(long directorId);
 
     List<Film> getDirectorFilmsSortByLikes(long directorId);
+
+    List<Film> getSearchResults(String query, String[] paramsList);
 }

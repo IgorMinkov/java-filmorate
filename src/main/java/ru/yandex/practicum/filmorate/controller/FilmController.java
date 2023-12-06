@@ -2,12 +2,20 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -57,8 +65,10 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(required = false,
-            defaultValue = "10") Integer count) {
-        return filmService.getPopularFilms(count);
+            defaultValue = "10") Integer count,
+                                      @RequestParam(name = "year", required = false) String year,
+                                      @RequestParam(name = "genreId", required = false) Long genreId) {
+        return filmService.getPopularFilms(genreId, year, count);
     }
 
     @GetMapping("/director/{directorId}")
@@ -69,5 +79,10 @@ public class FilmController {
         return filmService.getSortedFilmByDirector(directorId, sortMethod);
     }
 
+    @GetMapping("/search")
+    public List<Film> getSearchResults(@RequestParam(required = false, name = "query", defaultValue = "") String query,
+                                       @RequestParam(required = false, name = "by", defaultValue = "") String params) {
+        return filmService.getSearchResults(query, params);
+    }
 }
 
