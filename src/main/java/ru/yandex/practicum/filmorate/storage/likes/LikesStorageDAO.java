@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 
 import java.util.List;
 
@@ -47,8 +46,7 @@ public class LikesStorageDAO implements LikesStorage {
                 "LIMIT 1";
 
         return jdbcTemplate.queryForList(sqlQuery, Long.class, userId).stream()
-                .findFirst().orElseThrow(() ->
-                        new DataNotFoundException("не найдено пересечений по лайкам пользователя с id " + userId));
+                .findFirst().orElse(null);
     }
 
 }

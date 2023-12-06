@@ -102,6 +102,10 @@ public class FilmService {
         }
 
         Long sameTasteUserId = likesStorage.getSameLikesUserId(userId);
+        if (sameTasteUserId == null) {
+            return new ArrayList<>();
+        }
+
         List<Long> recommendFilmIds = likesStorage.getLikedFilmsId(sameTasteUserId).stream()
                 .filter(filmId -> !userFilms.contains(filmId))
                 .collect(Collectors.toList());
@@ -109,13 +113,8 @@ public class FilmService {
         if (recommendFilmIds.isEmpty()) {
             return new ArrayList<>();
         }
-        List<Film> recommendations = new ArrayList<>();
-        for (Long id : recommendFilmIds) {
-            Film film = getFilmById(id);
-            recommendations.add(film);
-        }
-        return recommendations;
-//      return recommendFilmIds.stream().map(this::getFilmById).collect(Collectors.toList());
+
+        return recommendFilmIds.stream().map(this::getFilmById).collect(Collectors.toList());
     }
 
     private void validateFilm(Long id) {
