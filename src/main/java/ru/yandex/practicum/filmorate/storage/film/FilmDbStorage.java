@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -19,7 +19,9 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +38,20 @@ public class FilmDbStorage implements FilmStorage {
 
     private final DirectorStorage directorStorage;
 
+
+    private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(rs.getLong("film_id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getLong("duration"))
+                .mpaRating(MpaRating.builder()
+                        .id(rs.getInt("mpa_rating"))
+                        .name(rs.getString("rating_name"))
+                        .build())
+                .build();
+    }
 
     @Override
     public List<Film> getAll() {
@@ -102,20 +118,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopular(Integer limit) {
-        String sqlQuery = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration," +
-                " f.mpa_rating, m.rating_name" +
-                " FROM films f" +
-                " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
-                " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
-                " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC LIMIT (?)";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, limit).stream()
-                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
-                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public void checkFilm(Long id) {
         try {
             Film film = getById(id);
@@ -160,19 +162,34 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
-    private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(rs.getLong("film_id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getLong("duration"))
-                .mpaRating(MpaRating.builder()
-                        .id(rs.getInt("mpa_rating"))
-                        .name(rs.getString("rating_name"))
-                        .build())
-                .build();
+    @Override
+    public List<Film> getPopular(Long genreId, String year, Integer limit) {
+        List<Object> sqlArgs = new ArrayList<>();
+        List<String> sqlConditions = new ArrayList<>();
+        if (year != null) {
+            sqlConditions.add("EXTRACT(YEAR FROM f.release_date)=?");
+            sqlArgs.add(year);
+        }
+        if (genreId != null) {
+            sqlConditions.add("g.genre_id=?");
+            sqlArgs.add(genreId);
+        }
+        String sqlQueryStatement = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration," +
+                " f.mpa_rating, m.rating_name" +
+                " FROM films f" +
+                " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
+                " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
+                " LEFT JOIN film_genres g ON f.film_id = g.film_id ";
+        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC LIMIT (?)";
+        String sqlCondition = String.join(" and ", sqlConditions);
+        if (!sqlCondition.isEmpty()) {
+            sqlCondition = "WHERE " + sqlCondition;
+        }
+        String resultQuery = sqlQueryStatement + sqlCondition + sqlQueryGroupBy;
+        sqlArgs.add(limit);
+        return jdbcTemplate.query(resultQuery, FilmDbStorage::buildFilm, sqlArgs.toArray()).stream()
+                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
+                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
+                .collect(Collectors.toList());
     }
-
-
 }

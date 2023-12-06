@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Film getById(Long id);
 
-    List<Film> getPopular(Integer limit);
+    List<Film> getPopular(Long genreId, String year, Integer limit);
 
     void checkFilm(Long id);
 
