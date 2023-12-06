@@ -229,7 +229,7 @@ public class FilmDbStorage implements FilmStorage {
                 " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
                 " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
                 " LEFT JOIN film_genres g ON f.film_id = g.film_id ";
-        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id), f.film_id DESC LIMIT (?)";
+        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id DESC LIMIT (?)";
         String sqlCondition = String.join(" and ", sqlConditions);
         if (!sqlCondition.isEmpty()) {
             sqlCondition = "WHERE " + sqlCondition;
