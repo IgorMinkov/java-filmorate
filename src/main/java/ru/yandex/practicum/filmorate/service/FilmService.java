@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -57,19 +59,14 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) {
         validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.addLike(userId, filmId);
+        likesStorage.addLike(filmId, userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
         validateFilm(filmId);
         userService.validateUser(userId);
-        likesStorage.removeLike(userId, filmId);
+        likesStorage.removeLike(filmId, userId);
     }
-
-    private void validateFilm(Long id) {
-        filmStorage.checkFilm(id);
-    }
-
 
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         userService.validateUser(userId);
@@ -93,6 +90,28 @@ public class FilmService {
             throw new DataNotFoundException("Отсутствуют фильмы указанного режиссера");
         }
         return films;
+    }
+
+    public List<Film> getRecommendations(Long userId) {
+        userService.validateUser(userId);
+        List<Long> userFilms = likesStorage.getLikedFilmsId(userId);
+        if (userFilms.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Long sameTasteUserId = likesStorage.getSameLikesUserId(userId);
+        if (sameTasteUserId == null) {
+            return List.of();
+        }
+
+        return likesStorage.getLikedFilmsId(sameTasteUserId).stream()
+                .filter(filmId -> !userFilms.contains(filmId))
+                .map(this::getFilmById)
+                .collect(Collectors.toList());
+    }
+
+    private void validateFilm(Long id) {
+        filmStorage.checkFilm(id);
     }
 
     public List<Film> getPopularFilms(Long genreId, String year, Integer limit) {

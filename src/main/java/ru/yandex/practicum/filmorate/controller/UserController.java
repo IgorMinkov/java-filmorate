@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.EventService;
@@ -19,10 +21,12 @@ public class UserController {
 
     private final UserService userService;
     private final EventService eventService;
+    private final FilmService filmService;
 
     @Autowired
-    public UserController(UserService userService, EventService eventService) {
+    public UserController(UserService userService, FilmService filmService, EventService eventService) {
         this.userService = userService;
+        this.filmService = filmService;
         this.eventService = eventService;
     }
 
@@ -70,6 +74,12 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> findCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.findCommonFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable("id") Long userId) {
+        log.info("Запрошены рекомендации для пользователя с id: {}", userId);
+        return filmService.getRecommendations(userId);
     }
 
     @GetMapping("/{id}/feed")
