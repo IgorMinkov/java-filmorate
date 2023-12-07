@@ -52,6 +52,13 @@ public class UserController {
         return userService.updateUser(user);
     }
 
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable("userId") Long userId) {
+        log.info("Получен DELETE-запрос /users/{}", userId);
+        userService.delete(userId);
+        log.info("Отправлен ответ на DELETE-запрос /users/{}", userId);
+    }
+
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("Для пользователя с id: {} добавляется друг с id : {}", id, friendId);

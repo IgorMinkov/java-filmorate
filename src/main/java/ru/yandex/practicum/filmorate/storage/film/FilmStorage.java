@@ -12,6 +12,8 @@ public interface FilmStorage {
 
     Film update(Film film);
 
+    void delete(Long id);
+
     Film getById(Long id);
 
     List<Film> getPopular(Long genreId, String year, Integer limit);

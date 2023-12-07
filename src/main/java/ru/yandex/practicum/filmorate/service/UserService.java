@@ -45,6 +45,11 @@ public class UserService {
         return userStorage.update(user);
     }
 
+    public void delete(Long userId) {
+        validateUser(userId);
+        userStorage.delete(userId);
+    }
+
     public User getUserById(Long id) {
         validateUser(id);
         return userStorage.getById(id);

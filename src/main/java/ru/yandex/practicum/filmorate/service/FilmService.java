@@ -52,6 +52,11 @@ public class FilmService {
         return filmStorage.update(film);
     }
 
+    public void delete(Long filmId) {
+        validateFilm(filmId);
+        filmStorage.delete(filmId);
+    }
+
     public Film getFilmById(Long id) {
         return filmStorage.getById(id);
     }
