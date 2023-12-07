@@ -20,12 +20,13 @@ public class EventService {
     private final UserService userService;
 
     public List<Event> getUserFeed(Long id) {
-        userService.getUserById(id);
+        userService.validateUser(id);
         return this.eventStorage.getUserFeed(id);
     }
 
     public Event addEvent(Long userId, Long entityId, String eventType, String operationType) {
-        userService.getUserById(userId);
+        userService.validateUser(userId);
         return this.eventStorage.addEvent(userId, entityId, eventType, operationType);
     }
+
 }

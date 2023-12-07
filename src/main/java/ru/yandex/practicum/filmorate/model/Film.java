@@ -31,10 +31,13 @@ public class Film {
     @JsonProperty("mpa")
     private MpaRating mpaRating;
 
+    @Builder.Default
     private Set<Genre> genres = new HashSet<>();
 
+    @Builder.Default
     private Set<Long> likes = new HashSet<>();
 
+    @Builder.Default
     private Set<Director> directors = new HashSet<>();
 
     public long getLikesCount() {

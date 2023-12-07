@@ -40,20 +40,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private final DirectorStorage directorStorage;
 
-    private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(rs.getLong("film_id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getLong("duration"))
-                .mpaRating(MpaRating.builder()
-                        .id(rs.getInt("mpa_rating"))
-                        .name(rs.getString("rating_name"))
-                        .build())
-                .build();
-    }
-
     @Override
     public List<Film> getAll() {
         String sqlQuery = "SELECT f.*, m.rating_name FROM films f LEFT JOIN mpa_rating m ON f.mpa_rating = m.id";
@@ -148,19 +134,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void checkFilm(Long id) {
-        try {
-            Film film = getById(id);
-            if (film == null) {
-                throw new DataNotFoundException(String.format("не найден фильм с id %s", id));
-            }
-            log.trace("check film id: {} - OK", id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("в БД не найден фильм с id %s", id));
-        }
-    }
-
-    @Override
     public List<Film> getDirectorFilmsSortByYear(long directorId) {
         String sqlQuery = "SELECT f.*, mr.* FROM DIRECTORS d " +
                 "JOIN FILM_DIRECTORS df ON d.ID = df.DIRECTOR_ID " +
@@ -240,7 +213,7 @@ public class FilmDbStorage implements FilmStorage {
                 " LEFT OUTER JOIN likes l ON l.film_id = f.film_id" +
                 " LEFT JOIN mpa_rating m ON f.mpa_rating = m.id" +
                 " LEFT JOIN film_genres g ON f.film_id = g.film_id ";
-        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id DESC LIMIT (?)";
+        String sqlQueryGroupBy = " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id LIMIT (?)";
         String sqlCondition = String.join(" and ", sqlConditions);
         if (!sqlCondition.isEmpty()) {
             sqlCondition = "WHERE " + sqlCondition;
@@ -252,4 +225,32 @@ public class FilmDbStorage implements FilmStorage {
                 .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void checkFilm(Long id) {
+        try {
+            Film film = getById(id);
+            if (film == null) {
+                throw new DataNotFoundException(String.format("не найден фильм с id %s", id));
+            }
+            log.trace("check film id: {} - OK", id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new DataNotFoundException(String.format("в БД не найден фильм с id %s", id));
+        }
+    }
+
+    private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(rs.getLong("film_id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getLong("duration"))
+                .mpaRating(MpaRating.builder()
+                        .id(rs.getInt("mpa_rating"))
+                        .name(rs.getString("rating_name"))
+                        .build())
+                .build();
+    }
+
 }

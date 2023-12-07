@@ -115,10 +115,6 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    private void validateFilm(Long id) {
-        filmStorage.checkFilm(id);
-    }
-
     public List<Film> getPopularFilms(Long genreId, String year, Integer limit) {
         if (limit == null || limit <= 0) {
             throw new ValidationException(
@@ -130,6 +126,10 @@ public class FilmService {
     public List<Film> getSearchResults(String query, String params) {
         String[] paramsList = params.split(",");
         return filmStorage.getSearchResults(query, paramsList);
+    }
+
+    private void validateFilm(Long id) {
+        filmStorage.checkFilm(id);
     }
 
 }

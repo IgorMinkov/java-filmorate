@@ -40,7 +40,8 @@ public class ReviewController {
         log.info("Получен запрос на добавление нового отзыва: {}", review);
 
         Review createdReview = reviewService.createReview(review);
-        eventService.addEvent(createdReview.getUserId(), createdReview.getReviewId(), "REVIEW", "ADD");
+        eventService.addEvent(createdReview.getUserId(), createdReview.getReviewId(),
+                "REVIEW", "ADD");
         return createdReview;
     }
 
@@ -49,7 +50,8 @@ public class ReviewController {
         log.info("Получен запрос на обновление имеющегося отзыва: {}", review);
 
         Review updatedReview = reviewService.updateReview(review);
-        eventService.addEvent(updatedReview.getUserId(), updatedReview.getReviewId(), "REVIEW", "UPDATE");
+        eventService.addEvent(updatedReview.getUserId(), updatedReview.getReviewId(),
+                "REVIEW", "UPDATE");
         return updatedReview;
     }
 
@@ -57,7 +59,8 @@ public class ReviewController {
     public void deleteReview(@Positive @PathVariable Long id) {
         log.info("Получен запрос на удаление отзыва по id: {}", id);
 
-        eventService.addEvent(reviewService.getReviewById(id).getUserId(), id, "REVIEW", "REMOVE");
+        eventService.addEvent(reviewService.getReviewById(id).getUserId(), id,
+                "REVIEW", "REMOVE");
         reviewService.deleteReview(id);
     }
 
@@ -69,7 +72,8 @@ public class ReviewController {
     }
 
     @GetMapping
-    public List<Review> getReviewsByFilmId(@RequestParam(required = false) Long filmId, @Positive @RequestParam(required = false, defaultValue = "10") Integer count) {
+    public List<Review> getReviewsByFilmId(@RequestParam(required = false) Long filmId,
+                                           @Positive @RequestParam(required = false, defaultValue = "10") Integer count) {
         log.info("Получен запрос на загрузку {} отзывов фильма по id: {}", count, filmId);
 
         if (filmId == null) {
@@ -122,4 +126,5 @@ public class ReviewController {
                 .isPositive(false)
                 .build());
     }
+
 }
