@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -15,18 +14,17 @@ import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 @RequiredArgsConstructor
 public class EventService {
 
-    @Qualifier("eventDbStorage")
     private final EventStorage eventStorage;
     private final UserService userService;
 
     public List<Event> getUserFeed(Long id) {
         userService.validateUser(id);
-        return this.eventStorage.getUserFeed(id);
+        return eventStorage.getUserFeed(id);
     }
 
     public Event addEvent(Long userId, Long entityId, String eventType, String operationType) {
         userService.validateUser(userId);
-        return this.eventStorage.addEvent(userId, entityId, eventType, operationType);
+        return eventStorage.addEvent(userId, entityId, eventType, operationType);
     }
 
 }
