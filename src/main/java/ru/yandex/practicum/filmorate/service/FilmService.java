@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
 
-    private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
+    public static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
     private final FilmStorage filmStorage;
 
@@ -115,7 +115,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public List<Film> getPopularFilms(Long genreId, String year, Integer limit) {
+    public List<Film> getPopularFilms(Long genreId, Integer year, Integer limit) {
         if (limit == null || limit <= 0) {
             throw new ValidationException(
                     String.format("в метод getPopularFilms передан некорректный параметр: %d", limit));

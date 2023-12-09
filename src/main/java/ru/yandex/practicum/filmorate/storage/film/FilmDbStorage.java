@@ -196,7 +196,7 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
       }
 
-    public List<Film> getPopular(Long genreId, String year, Integer limit) {
+    public List<Film> getPopular(Long genreId, Integer year, Integer limit) {
         List<Object> sqlArgs = new ArrayList<>();
         List<String> sqlConditions = new ArrayList<>();
         if (year != null) {

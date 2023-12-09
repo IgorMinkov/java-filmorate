@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +17,11 @@ import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/films")
 public class FilmController {
@@ -55,7 +58,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}")
-    public void deleteFilm(@PathVariable("filmId") Long filmId) {
+    public void deleteFilm(@Positive @PathVariable("filmId") Long filmId) {
         log.info("Получен DELETE-запрос /films/{}", filmId);
         filmService.delete(filmId);
         log.info("Отправлен ответ на DELETE-запрос /films/{}", filmId);
@@ -77,13 +80,13 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(required = false, defaultValue = "10") Integer count,
-                                      @RequestParam(name = "year", required = false) String year,
+                                      @RequestParam(name = "year", required = false) Integer year,
                                       @RequestParam(name = "genreId", required = false) Long genreId) {
         return filmService.getPopularFilms(genreId, year, count);
     }
 
     @GetMapping("/common")
-    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+    public List<Film> getCommonFilms(@Positive @RequestParam Long userId, @Positive @RequestParam Long friendId) {
         return filmService.getCommonFilms(userId, friendId);
     }
 
