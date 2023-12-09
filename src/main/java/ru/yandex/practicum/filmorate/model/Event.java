@@ -4,31 +4,33 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.ValidationException;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.util.HashMap;
 import java.util.Map;
 
-@Validated
 @Data
 @Builder
 public class Event implements Comparable<Event> {
-    Long eventId;
 
-    @NotNull @NotBlank @NotEmpty Long userId;
+    private Long eventId;
 
-    @NotNull @NotBlank @NotEmpty Long entityId;
+    @NotNull
+    private Long userId;
 
-    @NotNull EventType eventType;
+    @NotNull
+    private Long entityId;
 
-    @NotNull OperationType operation;
+    @NotNull
+    private EventType eventType;
 
-    @PastOrPresent Long timestamp;
+    @NotNull
+    private OperationType operation;
+
+    @PastOrPresent
+    private Long timestamp;
 
     public Map<String, Object> toMap() {
 

@@ -6,11 +6,9 @@ import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component("inMemoryFilmStorage")
@@ -51,10 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopular(Long genreId, Integer year, Integer limit) {
-        return getAll().stream()
-                .sorted(Comparator.comparingLong(Film::getLikesCount).reversed())
-                .limit(limit)
-                .collect(Collectors.toList());
+        return getAll();
     }
 
     @Override

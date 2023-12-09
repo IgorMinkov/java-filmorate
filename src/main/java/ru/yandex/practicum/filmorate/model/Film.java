@@ -35,18 +35,7 @@ public class Film {
     private Set<Genre> genres = new HashSet<>();
 
     @Builder.Default
-    private Set<Long> likes = new HashSet<>();
-
-    @Builder.Default
     private Set<Director> directors = new HashSet<>();
-
-    public long getLikesCount() {
-        if (likes == null) {
-            return 0;
-        } else {
-            return likes.size();
-        }
-    }
 
 }
 

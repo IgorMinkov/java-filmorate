@@ -14,6 +14,7 @@ public class Genre {
     private Integer id;
 
     @NotBlank
+    @Size(max = 63)
     private String name;
 
 }

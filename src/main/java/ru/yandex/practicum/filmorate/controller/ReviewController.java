@@ -73,7 +73,7 @@ public class ReviewController {
 
     @GetMapping
     public List<Review> getReviewsByFilmId(@RequestParam(required = false) Long filmId,
-                                           @Positive @RequestParam(required = false, defaultValue = "10") Integer count) {
+                                           @Positive @RequestParam(defaultValue = "10") Integer count) {
         log.info("Получен запрос на загрузку {} отзывов фильма по id: {}", count, filmId);
 
         if (filmId == null) {
