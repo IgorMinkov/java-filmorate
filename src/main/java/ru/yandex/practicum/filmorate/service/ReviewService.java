@@ -6,20 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 @Service
 public class ReviewService {
     private final ReviewStorage reviewStorage;
-    private final UserDbStorage userStorage;
-    private final FilmDbStorage filmStorage;
+    private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
     @Autowired
     public ReviewService(ReviewStorage reviewStorage,
-                         UserDbStorage userStorage,
-                         FilmDbStorage filmStorage
+                         UserStorage userStorage,
+                         FilmStorage filmStorage
     ) {
         this.reviewStorage = reviewStorage;
         this.userStorage = userStorage;
