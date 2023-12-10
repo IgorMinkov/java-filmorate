@@ -27,7 +27,7 @@ public class FriendshipStorageDAO implements FriendshipStorage {
     @Override
     public List<User> getFriends(Long userId) {
         try {
-            String sqlQuery ="SELECT u.user_id, u.email, u.login, u.name, u.birthday " +
+            String sqlQuery = "SELECT u.user_id, u.email, u.login, u.name, u.birthday " +
                     "FROM users u " +
                     "LEFT JOIN friendship f ON u.user_id = f.friend_id " +
                     "WHERE f.user_id = ? ";
