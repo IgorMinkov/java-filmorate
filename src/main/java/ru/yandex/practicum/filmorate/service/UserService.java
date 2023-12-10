@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.friends.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -73,9 +72,7 @@ public class UserService {
     public List<User> findCommonFriends(Long id, Long otherId) {
         validateUser(id);
         validateUser(otherId);
-        return getFriendList(id).stream()
-                .filter(x -> getFriendList(otherId).contains(x))
-                .collect(Collectors.toList());
+        return friendshipStorage.findCommonFriends(id, otherId);
     }
 
     protected void validateUser(Long id) {
