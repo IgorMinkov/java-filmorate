@@ -13,6 +13,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 @Slf4j
 @Component
@@ -100,6 +103,24 @@ public class DirectorStorageDao implements DirectorStorage {
             throw new DataNotFoundException("Режиссер с id " + directorId + " не найден");
         }
         log.info("Режиссер с {} успешно удален", directorId);
+    }
+
+    @Override
+    public void fetchFilmDirectors(List<Film> films) {
+        Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        Set<Long> ids = filmById.keySet();
+
+        String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
+        String sqlQuery = String.format("SELECT d.*, df.film_id FROM film_directors df JOIN directors d " +
+                "ON df.director_id = d.id WHERE df.film_id IN (%s)", inSql);
+
+        jdbcTemplate.query(sqlQuery, (rs, rowNum) -> {
+            Long filmId = rs.getLong("film_id");
+            Film film = filmById.get(filmId);
+            film.addDirector(buildDirector(rs, rowNum));
+
+            return null;
+        }, ids.toArray());
     }
 
     private static Director buildDirector(ResultSet rs, int rowNum) throws SQLException {
