@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -226,15 +225,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void checkFilm(Long id) {
-        try {
             Film film = getById(id);
-            if (film == null) {
-                throw new DataNotFoundException(String.format("не найден фильм с id %s", id));
-            }
             log.trace("check film id: {} - OK", id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("в БД не найден фильм с id %s", id));
-        }
     }
 
     private static Film buildFilm(ResultSet rs, int rowNum) throws SQLException {

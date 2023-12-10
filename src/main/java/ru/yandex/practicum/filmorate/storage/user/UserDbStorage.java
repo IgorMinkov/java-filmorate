@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -91,15 +90,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void checkUser(Long id) {
-        try {
             User user = getById(id);
-            if (user == null) {
-                throw new DataNotFoundException(String.format("не найден пользователь с id %s", id));
-            }
             log.trace("check user id: {} - OK", id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("Ошибка SQL- в БД нет пользователя с id %s", id));
-        }
     }
 
     private static User buildUser(ResultSet rs, int rowNum) throws SQLException {
