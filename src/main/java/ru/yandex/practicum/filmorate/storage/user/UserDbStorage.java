@@ -2,8 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -20,20 +19,19 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-@Qualifier("userDbStorage")
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         String sqlQuery = "SELECT * FROM users GROUP BY user_id";
         return jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser);
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(User user) {
         String sqlQuery = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -52,7 +50,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         checkUser(user.getId());
         String sqlQuery = "UPDATE USERS SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
         jdbcTemplate.update(sqlQuery,
@@ -66,7 +64,25 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public void delete(Long userId) {
+        String sqlQueryDeleteLike = "DELETE FROM likes WHERE user_id = ?";
+        String sqlQueryDeleteFriendship = "DELETE FROM friendship WHERE user_id AND friend_id IN(?)";
+        String sqlQueryDeleteUser = "DELETE FROM users WHERE user_id = ?";
+        String sqlQueryDeleteReviews = "DELETE FROM reviews WHERE user_id = ?";
+        String sqlQueryDeleteLikeReviews = "DELETE FROM review_rating WHERE user_id = ?";
+        try {
+            jdbcTemplate.update(sqlQueryDeleteLike, userId);
+            jdbcTemplate.update(sqlQueryDeleteFriendship, userId);
+            jdbcTemplate.update(sqlQueryDeleteReviews, userId);
+            jdbcTemplate.update(sqlQueryDeleteLikeReviews, userId);
+            jdbcTemplate.update(sqlQueryDeleteUser, userId);
+        } catch (DataAccessException e) {
+            throw new DataNotFoundException("Пользователь не найден" + e.getMessage());
+        }
+    }
+
+    @Override
+    public User getById(Long id) {
         String sqlQuery = "SELECT * FROM users u WHERE u.user_id = ?";
         return jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id).stream().findAny()
                 .orElseThrow(() -> new DataNotFoundException(String.format("не найден фильм с id %s", id)));
@@ -74,18 +90,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void checkUser(Long id) {
-        try {
-            User user = getUserById(id);
-            if (user == null) {
-                throw new DataNotFoundException(String.format("не найден пользователь с id %s", id));
-            }
+            User user = getById(id);
             log.trace("check user id: {} - OK", id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException(String.format("Ошибка SQL- в БД нет пользователя с id %s", id));
-        }
     }
 
-    private static User buildUser(ResultSet rs, int rowNum) throws SQLException {
+    public static User buildUser(ResultSet rs, int rowNum) throws SQLException {
         return User.builder()
                 .id(rs.getLong("user_id"))
                 .email(rs.getString("email"))

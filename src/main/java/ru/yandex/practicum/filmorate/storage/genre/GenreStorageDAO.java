@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
@@ -11,22 +10,24 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 @Component
-@Qualifier("genreStorageDAO")
 @RequiredArgsConstructor
 public class GenreStorageDAO implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Genre> getAllGenres() {
+    public List<Genre> getAll() {
         String sqlQuery = "SELECT * FROM genres GROUP BY id";
         return jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre);
     }
 
     @Override
-    public Genre getGenreById(Integer id) {
+    public Genre getById(Integer id) {
         String sqlQuery = "SELECT * FROM genres g WHERE g.id = ?";
         return jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, id).stream()
                 .findAny().orElseThrow(() -> new DataNotFoundException("не найден жанр с id" + id));
@@ -51,6 +52,24 @@ public class GenreStorageDAO implements GenreStorage {
                 jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
             }
         }
+    }
+
+    @Override
+    public void fetchFilmGenres(List<Film> films) {
+        Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        Set<Long> ids = filmById.keySet();
+
+        String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
+        String sqlQuery = String.format("SELECT g.genre, g.id, fg.film_id film_id FROM film_genres fg " +
+                "LEFT JOIN genres g ON g.id = fg.genre_id WHERE fg.film_id IN (%s)", inSql);
+
+        jdbcTemplate.query(sqlQuery, (rs, rowNum) -> {
+            Long filmId = rs.getLong("film_id");
+            Film film = filmById.get(filmId);
+            film.addGenre(buildGenre(rs, rowNum));
+
+            return null;
+        }, ids.toArray());
     }
 
     private static Genre buildGenre(ResultSet rs, int rowNum) throws SQLException {

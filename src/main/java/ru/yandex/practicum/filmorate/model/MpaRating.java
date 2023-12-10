@@ -14,6 +14,7 @@ public class MpaRating {
     private Integer id;
 
     @NotBlank
+    @Size(max = 63)
     private String name;
 
 }

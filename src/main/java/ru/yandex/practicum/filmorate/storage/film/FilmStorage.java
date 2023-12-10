@@ -6,16 +6,25 @@ import java.util.List;
 
 public interface FilmStorage {
 
-    List<Film> getAllFilms();
+    List<Film> getAll();
 
-    Film createFilm(Film film);
+    Film create(Film film);
 
-    Film updateFilm(Film film);
+    Film update(Film film);
 
-    Film getFilmById(Long id);
+    void delete(Long id);
 
-    List<Film> getPopularFilms(Integer limit);
+    Film getById(Long id);
+
+    List<Film> getPopular(Long genreId, Integer year, Integer limit);
+
+    List<Film> getCommon(Long userId, Long friendId);
+
+    List<Film> getDirectorFilmsSortByYear(long directorId);
+
+    List<Film> getDirectorFilmsSortByLikes(long directorId);
+
+    List<Film> getSearchResults(String query, String[] paramsList);
 
     void checkFilm(Long id);
-
 }

@@ -2,23 +2,38 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortingTypes;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.*;
+import javax.validation.constraints.Positive;
+import java.util.List;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/films")
 public class FilmController {
 
     private final FilmService filmService;
+    private final EventService eventService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, EventService eventService) {
         this.filmService = filmService;
+        this.eventService = eventService;
     }
 
     @GetMapping
@@ -43,23 +58,51 @@ public class FilmController {
         return filmService.updateFilm(film);
     }
 
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@Positive @PathVariable("filmId") Long filmId) {
+        log.info("Получен DELETE-запрос /films/{}", filmId);
+        filmService.delete(filmId);
+        log.info("Отправлен ответ на DELETE-запрос /films/{}", filmId);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Фильму с id: {} ставит лайк пользователь с id : {}", id, userId);
         filmService.addLike(id, userId);
+        eventService.addEvent(userId, id, "LIKE", "ADD");
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Фильму с id: {} удаляет лайк пользователь с id : {}", id, userId);
         filmService.removeLike(id, userId);
+        eventService.addEvent(userId, id, "LIKE", "REMOVE");
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(required = false,
-            defaultValue = "10") Integer count) {
-        return filmService.getPopularFilms(count);
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count,
+                                      @RequestParam(name = "year", required = false) Integer year,
+                                      @RequestParam(name = "genreId", required = false) Long genreId) {
+        return filmService.getPopularFilms(genreId, year, count);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@Positive @RequestParam Long userId, @Positive @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmsByDirector(
+            @PathVariable("directorId") Long directorId,
+            @RequestParam("sortBy") String sortMethod) {
+        return filmService.getSortedFilmByDirector(directorId,
+                Enum.valueOf(SortingTypes.class, sortMethod.toUpperCase()));
+    }
+
+    @GetMapping("/search")
+    public List<Film> getSearchResults(@RequestParam(name = "query", defaultValue = "") String query,
+                                       @RequestParam(name = "by", defaultValue = "") String params) {
+        return filmService.getSearchResults(query, params);
     }
 
 }
-

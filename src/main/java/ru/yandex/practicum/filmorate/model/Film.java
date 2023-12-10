@@ -31,16 +31,18 @@ public class Film {
     @JsonProperty("mpa")
     private MpaRating mpaRating;
 
+    @Builder.Default
     private Set<Genre> genres = new HashSet<>();
 
-    private Set<Long> likes = new HashSet<>();
+    @Builder.Default
+    private Set<Director> directors = new HashSet<>();
 
-    public long getLikesCount() {
-        if (likes == null) {
-            return 0;
-        } else {
-            return likes.size();
-        }
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
+    public void addDirector(Director director) {
+        directors.add(director);
     }
 
 }

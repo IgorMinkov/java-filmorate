@@ -4,8 +4,6 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
@@ -17,18 +15,19 @@ public class User {
 
     @NotEmpty
     @Email
+    @Size(max = 127)
     private String email;
 
     @NotBlank
+    @Size(max = 127)
     @Pattern(regexp = "^[a-zA-Z0-9]{1,20}$")
     private String login;
 
+    @Size(max = 127)
     private String name;
 
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
-
-    private Set<Long> friends = new HashSet<>();
 
 }

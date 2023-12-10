@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -13,20 +12,19 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-@Qualifier("mpaRatingDAO")
 @RequiredArgsConstructor
 public class MpaRatingDAO implements MpaRatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<MpaRating> getAllMpaRatings() {
+    public List<MpaRating> getAll() {
         String sqlQuery = "SELECT * FROM mpa_rating";
         return jdbcTemplate.query(sqlQuery, MpaRatingDAO::buildMpaRating);
     }
 
     @Override
-    public MpaRating getMpaRatingById(Integer id) {
+    public MpaRating getById(Integer id) {
         String sqlQuery = "SELECT * FROM mpa_rating mpa WHERE mpa.id = ?";
         return jdbcTemplate.query(sqlQuery, MpaRatingDAO::buildMpaRating, id).stream()
                 .findAny().orElseThrow(() -> new DataNotFoundException("не найден рейтинг с id" + id));
@@ -35,7 +33,7 @@ public class MpaRatingDAO implements MpaRatingStorage {
     @Override
     public void checkMpaRating(Integer id) {
         try {
-            MpaRating rating = getMpaRatingById(id);
+            MpaRating rating = getById(id);
             if (rating == null) {
                 throw new DataNotFoundException(String.format("не найден рейтинг с id %s", id));
             }

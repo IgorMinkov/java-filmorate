@@ -2,19 +2,18 @@ package ru.yandex.practicum.filmorate.storage.friends;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.util.*;
 
 @Slf4j
 @Component
-@Qualifier
 @RequiredArgsConstructor
-public class FriendshipStorageDAO implements  FriendshipStorage {
+public class FriendshipStorageDAO implements FriendshipStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -26,17 +25,34 @@ public class FriendshipStorageDAO implements  FriendshipStorage {
     }
 
     @Override
-    public Set<Long> getUserFriends(Long userId) {
-        Set<Long> friends = new HashSet<>();
+    public List<User> getFriends(Long userId) {
         try {
-            String sqlQuery = "SELECT friend_id FROM friendship WHERE user_id = ?";
-            SqlRowSet friendsRows = jdbcTemplate.queryForRowSet(sqlQuery, userId);
-            while (friendsRows.next()) {
-                friends.add(friendsRows.getLong("friend_id"));
-            }
-            return friends;
+            String sqlQuery = "SELECT u.user_id, u.email, u.login, u.name, u.birthday " +
+                    "FROM users u " +
+                    "LEFT JOIN friendship f ON u.user_id = f.friend_id " +
+                    "WHERE f.user_id = ? ";
+
+            return jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, userId);
         } catch (EmptyResultDataAccessException e) {
-            return Collections.emptySet();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<User> findCommonFriends(Long id, Long otherId) {
+        try {
+        String sqlQuery = " SELECT *" +
+                " FROM users " +
+                " WHERE user_id in (SELECT friend_id " +
+                " FROM friendship " +
+                " WHERE friend_id in (SELECT friend_id " +
+                " FROM friendship " +
+                " WHERE user_id = ?) " +
+                " AND user_id = ?);";
+
+            return jdbcTemplate.query(sqlQuery, UserDbStorage::buildUser, id, otherId);
+        } catch (EmptyResultDataAccessException e) {
+            return Collections.emptyList();
         }
     }
 
