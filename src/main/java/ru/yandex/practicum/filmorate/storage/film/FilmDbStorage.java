@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -124,10 +123,10 @@ public class FilmDbStorage implements FilmStorage {
                 "ORDER BY COUNT(ul.user_id), f.film_id DESC";
 
         log.debug("Получены общие фильмы у пользователей с id {} и {}.", userId, friendId);
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, userId, friendId).stream()
-                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
-                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
-                .collect(Collectors.toList());
+        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, userId, friendId);
+        genreStorage.fetchFilmGenres(films);
+        directorStorage.fetchFilmDirectors(films);
+        return films;
     }
 
     @Override
@@ -139,10 +138,10 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE d.ID = ?" +
                 "ORDER BY f.RELEASE_DATE ASC";
         log.info("Получение фильмов режиссера с id {} с сортировкой по годам", directorId);
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, directorId).stream()
-                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
-                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
-                .collect(Collectors.toList());
+        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, directorId);
+        genreStorage.fetchFilmGenres(films);
+        directorStorage.fetchFilmDirectors(films);
+        return films;
     }
 
     @Override
@@ -156,10 +155,10 @@ public class FilmDbStorage implements FilmStorage {
                 "GROUP BY f.FILM_ID " +
                 "ORDER BY COUNT(l.USER_ID) DESC";
         log.info("Получение фильмов режиссера с id {} с сортировкой по лайкам", directorId);
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, directorId).stream()
-                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
-                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
-                .collect(Collectors.toList());
+        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, directorId);
+        genreStorage.fetchFilmGenres(films);
+        directorStorage.fetchFilmDirectors(films);
+        return films;
     }
 
     @Override
@@ -187,10 +186,10 @@ public class FilmDbStorage implements FilmStorage {
             sqlQuery += " WHERE " + String.join(" OR ", sqlConditions);
         }
         sqlQuery += " GROUP BY f.film_id ORDER BY COUNT(l.user_id) DESC, f.film_id DESC";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, sqlArgs.toArray()).stream()
-                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
-                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
-                .collect(Collectors.toList());
+        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::buildFilm, sqlArgs.toArray());
+        genreStorage.fetchFilmGenres(films);
+        directorStorage.fetchFilmDirectors(films);
+        return films;
       }
 
     public List<Film> getPopular(Long genreId, Integer year, Integer limit) {
@@ -217,10 +216,10 @@ public class FilmDbStorage implements FilmStorage {
         }
         String resultQuery = sqlQueryStatement + sqlCondition + sqlQueryGroupBy;
         sqlArgs.add(limit);
-        return jdbcTemplate.query(resultQuery, FilmDbStorage::buildFilm, sqlArgs.toArray()).stream()
-                .peek(film -> film.setGenres(genreStorage.getFilmGenres(film.getId())))
-                .peek(film -> film.setDirectors(directorStorage.getByFilmId(film.getId())))
-                .collect(Collectors.toList());
+        List<Film> films = jdbcTemplate.query(resultQuery, FilmDbStorage::buildFilm, sqlArgs.toArray());
+        genreStorage.fetchFilmGenres(films);
+        directorStorage.fetchFilmDirectors(films);
+        return films;
     }
 
     @Override
