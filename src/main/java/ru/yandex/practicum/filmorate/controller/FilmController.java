@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortingTypes;
 import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -94,7 +95,8 @@ public class FilmController {
     public List<Film> getFilmsByDirector(
             @PathVariable("directorId") Long directorId,
             @RequestParam("sortBy") String sortMethod) {
-        return filmService.getSortedFilmByDirector(directorId, sortMethod);
+        return filmService.getSortedFilmByDirector(directorId,
+                Enum.valueOf(SortingTypes.class, sortMethod.toUpperCase()));
     }
 
     @GetMapping("/search")

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortingTypes;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 
@@ -77,13 +78,13 @@ public class FilmService {
         return filmStorage.getCommon(userId, friendId);
     }
 
-    public List<Film> getSortedFilmByDirector(Long directorId, String sortMethod) {
+    public List<Film> getSortedFilmByDirector(Long directorId, SortingTypes sortMethod) {
         List<Film> films;
-        switch (sortMethod.toLowerCase()) {
-            case "year":
+        switch (sortMethod) {
+            case YEAR:
                 films = filmStorage.getDirectorFilmsSortByYear(directorId);
                 break;
-            case "likes":
+            case LIKES:
                 films = filmStorage.getDirectorFilmsSortByLikes(directorId);
                 break;
             default:
