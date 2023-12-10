@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -26,8 +25,7 @@ public class FilmService {
     private final UserService userService;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       UserService userService, LikesStorage likesStorage) {
+    public FilmService(FilmStorage filmStorage, UserService userService, LikesStorage likesStorage) {
         this.filmStorage = filmStorage;
         this.userService = userService;
         this.likesStorage = likesStorage;

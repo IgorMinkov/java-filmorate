@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.model.ReviewRating;
@@ -18,7 +17,8 @@ public class ReviewRatingService {
     @Autowired
     public ReviewRatingService(ReviewRatingDbStorage reviewRatingDbStorage,
                                ReviewStorage reviewStorage,
-                               @Qualifier("userDbStorage") UserStorage userStorage) {
+                               UserStorage userStorage
+    ) {
         this.reviewRatingDbStorage = reviewRatingDbStorage;
         this.reviewStorage = reviewStorage;
         this.userStorage = userStorage;
