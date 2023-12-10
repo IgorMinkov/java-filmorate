@@ -37,5 +37,8 @@ public class Film {
     @Builder.Default
     private Set<Director> directors = new HashSet<>();
 
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
 }
 

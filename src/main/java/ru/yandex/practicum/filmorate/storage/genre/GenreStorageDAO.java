@@ -10,6 +10,9 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 @Component
 @RequiredArgsConstructor
@@ -36,6 +39,24 @@ public class GenreStorageDAO implements GenreStorage {
                 "LEFT JOIN genres g ON g.id = fg.genre_id WHERE fg.film_id = ?";
 
         return new HashSet<>(jdbcTemplate.query(sqlQuery, GenreStorageDAO::buildGenre, filmId));
+    }
+
+    @Override
+    public void fetchFilmGenres(List<Film> films) {
+        Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        Set<Long> ids = filmById.keySet();
+
+        String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
+        String sqlQuery = String.format("SELECT g.genre, g.id, fg.film_id film_id FROM film_genres fg " +
+                "LEFT JOIN genres g ON g.id = fg.genre_id WHERE fg.film_id IN (%s)", inSql);
+
+        jdbcTemplate.query(sqlQuery, (rs, rowNum) -> {
+            Long filmId = rs.getLong("film_id");
+            Film film = filmById.get(filmId);
+            film.addGenre(buildGenre(rs, rowNum));
+
+            return null;
+        }, ids.toArray());
     }
 
     @Override
