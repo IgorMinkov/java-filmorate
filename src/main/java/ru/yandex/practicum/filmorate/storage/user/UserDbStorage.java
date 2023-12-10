@@ -94,7 +94,7 @@ public class UserDbStorage implements UserStorage {
             log.trace("check user id: {} - OK", id);
     }
 
-    private static User buildUser(ResultSet rs, int rowNum) throws SQLException {
+    public static User buildUser(ResultSet rs, int rowNum) throws SQLException {
         return User.builder()
                 .id(rs.getLong("user_id"))
                 .email(rs.getString("email"))

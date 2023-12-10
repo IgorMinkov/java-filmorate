@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friends.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,11 +67,7 @@ public class UserService {
 
     public List<User> getFriendList(Long id) {
         validateUser(id);
-        List<User> friendList = new ArrayList<>();
-        for (Long friendId : friendshipStorage.getFriends(id)) {
-            friendList.add(getUserById(friendId));
-        }
-        return friendList;
+        return friendshipStorage.getFriends(id);
     }
 
     public List<User> findCommonFriends(Long id, Long otherId) {
