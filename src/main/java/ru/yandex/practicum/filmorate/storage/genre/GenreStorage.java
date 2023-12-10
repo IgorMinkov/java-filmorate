@@ -16,4 +16,6 @@ public interface GenreStorage {
 
     void updateFilmGenres(Film film);
 
+    void fetchFilmGenres(List<Film> films);
+
 }
