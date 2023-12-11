@@ -90,9 +90,6 @@ public class UserController {
     public List<Film> getRecommendations(@Positive @PathVariable("id") Long userId) {
         log.info("Запрошены рекомендации для пользователя с id: {}", userId);
         List<Film> foundedList = filmService.getRecommendations(userId);
-        if (foundedList == null) {
-            return new ArrayList<>();
-        }
         return foundedList;
     }
 
