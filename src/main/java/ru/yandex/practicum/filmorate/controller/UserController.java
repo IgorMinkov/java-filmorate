@@ -89,7 +89,8 @@ public class UserController {
     @GetMapping("/{id}/recommendations")
     public List<Film> getRecommendations(@Positive @PathVariable("id") Long userId) {
         log.info("Запрошены рекомендации для пользователя с id: {}", userId);
-        return filmService.getRecommendations(userId);
+        List<Film> foundedList = filmService.getRecommendations(userId);
+        return foundedList;
     }
 
     @GetMapping("/{id}/feed")
